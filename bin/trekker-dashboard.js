@@ -2,8 +2,32 @@
 import { Command } from "commander";
 import { spawn } from "child_process";
 import { resolve, dirname } from "path";
-import { existsSync } from "fs";
+import { existsSync, readdirSync } from "fs";
 import { fileURLToPath } from "url";
+
+function findServerJs(dir, depth = 0) {
+  if (depth > 5 || !existsSync(dir)) return null;
+
+  const serverPath = resolve(dir, "server.js");
+  if (existsSync(serverPath)) {
+    // Make sure it's the Next.js server, not a nested node_modules one
+    const isNodeModules = dir.includes("node_modules");
+    if (!isNodeModules) return serverPath;
+  }
+
+  try {
+    const entries = readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory() && entry.name !== "node_modules") {
+        const found = findServerJs(resolve(dir, entry.name), depth + 1);
+        if (found) return found;
+      }
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,15 +68,18 @@ program
     console.log(`Using database: ${dbPath}`);
     console.log("Press Ctrl+C to stop\n");
 
-    // Find the standalone build
-    const standaloneDir = resolve(__dirname, "..", ".next", "standalone");
-    const serverPath = resolve(standaloneDir, "server.js");
+    // Find the standalone build - Next.js nests it under the original project path
+    const packageRoot = resolve(__dirname, "..");
+    const standaloneBase = resolve(packageRoot, ".next", "standalone");
 
-    if (!existsSync(serverPath)) {
+    // Find server.js - search for it in standalone directory
+    const serverPath = findServerJs(standaloneBase);
+    if (!serverPath) {
       console.error("Error: Standalone server not found.");
       console.error("The package may not have been built correctly.");
       process.exit(1);
     }
+    const standaloneDir = dirname(serverPath);
 
     const server = spawn("node", [serverPath], {
       cwd: standaloneDir,
