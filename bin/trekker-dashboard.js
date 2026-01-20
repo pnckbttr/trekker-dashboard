@@ -2,7 +2,7 @@
 import { Command } from "commander";
 import { spawn } from "child_process";
 import { resolve, dirname } from "path";
-import { existsSync, readdirSync } from "fs";
+import { existsSync, readdirSync, cpSync, mkdirSync } from "fs";
 import { fileURLToPath } from "url";
 
 function findServerJs(baseDir, currentDir, depth = 0) {
@@ -82,6 +82,21 @@ program
       process.exit(1);
     }
     const standaloneDir = dirname(serverPath);
+
+    // Copy static files to the expected location if not present
+    const staticSrc = resolve(packageRoot, ".next", "static");
+    const staticDest = resolve(standaloneDir, ".next", "static");
+    if (existsSync(staticSrc) && !existsSync(staticDest)) {
+      mkdirSync(resolve(standaloneDir, ".next"), { recursive: true });
+      cpSync(staticSrc, staticDest, { recursive: true });
+    }
+
+    // Copy public folder if not present
+    const publicSrc = resolve(packageRoot, "public");
+    const publicDest = resolve(standaloneDir, "public");
+    if (existsSync(publicSrc) && !existsSync(publicDest)) {
+      cpSync(publicSrc, publicDest, { recursive: true });
+    }
 
     const server = spawn("node", [serverPath], {
       cwd: standaloneDir,
