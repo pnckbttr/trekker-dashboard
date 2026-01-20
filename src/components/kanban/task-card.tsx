@@ -26,7 +26,7 @@ export function TaskCard({ task, epicName, subtasks, onClick }: TaskCardProps) {
   return (
     <div
       data-task-id={task.id}
-      className={`p-2 cursor-pointer hover:ring bg-accent w-full flex flex-col`}
+      className={`p-2 cursor-pointer hover:ring bg-accent w-full flex flex-col wrap-break-word`}
       onClick={onClick}
     >
       <div className="flex items-center justify-between mb-1">

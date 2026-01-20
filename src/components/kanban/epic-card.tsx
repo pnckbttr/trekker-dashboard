@@ -14,7 +14,7 @@ interface EpicCardProps {
 export function EpicCard({ epic, taskCount, onClick }: EpicCardProps) {
   return (
     <div
-      className="p-2 cursor-pointer bg-blue-50 dark:bg-blue-800 hover:ring"
+      className="p-2 cursor-pointer bg-blue-50 dark:bg-blue-800 hover:ring wrap-break-word"
       onClick={onClick}
     >
       <div className="flex items-center justify-between mb-1">
