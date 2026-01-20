@@ -5,21 +5,23 @@ import { resolve, dirname } from "path";
 import { existsSync, readdirSync } from "fs";
 import { fileURLToPath } from "url";
 
-function findServerJs(dir, depth = 0) {
+function findServerJs(baseDir, currentDir, depth = 0) {
+  const dir = currentDir || baseDir;
   if (depth > 5 || !existsSync(dir)) return null;
 
   const serverPath = resolve(dir, "server.js");
   if (existsSync(serverPath)) {
-    // Make sure it's the Next.js server, not a nested node_modules one
-    const isNodeModules = dir.includes("node_modules");
-    if (!isNodeModules) return serverPath;
+    // Check relative path from base to avoid matching node_modules servers
+    const relativePath = dir.slice(baseDir.length);
+    const isNodeModulesServer = relativePath.includes("node_modules");
+    if (!isNodeModulesServer) return serverPath;
   }
 
   try {
     const entries = readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
       if (entry.isDirectory() && entry.name !== "node_modules") {
-        const found = findServerJs(resolve(dir, entry.name), depth + 1);
+        const found = findServerJs(baseDir, resolve(dir, entry.name), depth + 1);
         if (found) return found;
       }
     }
