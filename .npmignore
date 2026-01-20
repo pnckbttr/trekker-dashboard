@@ -1,0 +1,51 @@
+# Source files (we publish .next/standalone)
+src/
+
+# Config files
+tsconfig.json
+postcss.config.mjs
+components.json
+next.config.js
+next-env.d.ts
+.editorconfig
+.prettierrc
+.eslintrc*
+
+# Development files
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
+
+# Trekker database
+.trekker/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs
+*.log
+
+# Documentation (keep README)
+docs/
+CONTRIBUTING.md
+CHANGELOG.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Build artifacts we don't need
+.next/cache/
