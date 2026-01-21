@@ -1,15 +1,19 @@
 "use client";
 
-import { useAppData } from "@/hooks/use-data";
+import { useState } from "react";
+import { useAppData, useBulkArchiveCompleted } from "@/hooks/use-data";
 import { useTaskEvents } from "@/hooks/use-task-events";
 import { useUIStore } from "@/stores";
 import { KanbanBoard } from "@/components/kanban";
 import { TaskDetailModal } from "@/components/task-detail";
 import { EpicDetailModal } from "@/components/epic-detail";
 import { CreateModal } from "@/components/create-modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function KanbanPage() {
   const { tasks, epics, isLoading, error, refetch } = useAppData();
+  const bulkArchive = useBulkArchiveCompleted();
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const {
     selectedTaskId,
     selectedEpicId,
@@ -61,8 +65,18 @@ export function KanbanPage() {
           onAddClick={(status) => openCreateModal({ status })}
           onTaskClick={(task) => openTaskDetail(task.id)}
           onEpicClick={(epic) => openEpicDetail(epic.id)}
+          onArchiveAllCompleted={() => setShowArchiveConfirm(true)}
         />
       </main>
+
+      <ConfirmDialog
+        open={showArchiveConfirm}
+        onOpenChange={setShowArchiveConfirm}
+        title="Archive All Completed"
+        description="This will move all completed tasks and epics to the archived status. This action can be undone by manually changing their status back."
+        confirmLabel="Archive All"
+        onConfirm={() => bulkArchive.mutate()}
+      />
 
       {/* Modals */}
       <TaskDetailModal

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { UseFormReturn, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   EPIC_STATUSES,
   TASK_STATUSES,
@@ -129,6 +131,15 @@ interface TaskFieldsProps {
 function TaskFields({ form, epics }: TaskFieldsProps) {
   const { register, control } = form;
 
+  const epicOptions = useMemo(
+    () =>
+      epics.map((epic) => ({
+        value: epic.id,
+        label: `${epic.id}: ${epic.title}`,
+      })),
+    [epics]
+  );
+
   return (
     <>
       <div className="space-y-2">
@@ -145,22 +156,13 @@ function TaskFields({ form, epics }: TaskFieldsProps) {
           control={control}
           name="epicId"
           render={({ field }) => (
-            <Select
-              value={field.value || "none"}
-              onValueChange={(v) => field.onChange(v === "none" ? null : v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No Epic</SelectItem>
-                {epics.map((epic) => (
-                  <SelectItem key={epic.id} value={epic.id}>
-                    {epic.id}: {epic.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={epicOptions}
+              value={field.value}
+              onValueChange={field.onChange}
+              placeholder="No Epic"
+              emptyText="No epics found"
+            />
           )}
         />
       </div>
@@ -181,6 +183,15 @@ function SubtaskFields({ form, parentTasks }: SubtaskFieldsProps) {
     formState: { errors },
   } = form;
 
+  const taskOptions = useMemo(
+    () =>
+      parentTasks.map((task) => ({
+        value: task.id,
+        label: `${task.id}: ${task.title}`,
+      })),
+    [parentTasks]
+  );
+
   return (
     <>
       <div className="space-y-2">
@@ -199,22 +210,13 @@ function SubtaskFields({ form, parentTasks }: SubtaskFieldsProps) {
           control={control}
           name="parentTaskId"
           render={({ field }) => (
-            <Select
-              value={field.value || "none"}
-              onValueChange={(v) => field.onChange(v === "none" ? "" : v)}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">Select a task...</SelectItem>
-                {parentTasks.map((task) => (
-                  <SelectItem key={task.id} value={task.id}>
-                    {task.id}: {task.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              options={taskOptions}
+              value={field.value || null}
+              onValueChange={(v) => field.onChange(v || "")}
+              placeholder="Select a task..."
+              emptyText="No tasks found"
+            />
           )}
         />
         {errors.parentTaskId && (

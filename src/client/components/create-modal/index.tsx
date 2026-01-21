@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from "react";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -22,7 +22,7 @@ import { CreateForm } from "./create-form";
 import { useCreateForm } from "./use-create-form";
 import type { CreateType, Epic, Task } from "@/types";
 
-interface CreateModalProps {
+interface CreateDrawerProps {
   open: boolean;
   onClose: () => void;
   onCreated: () => void;
@@ -32,58 +32,11 @@ interface CreateModalProps {
   defaultType?: CreateType;
 }
 
-const TYPE_ICONS = {
-  epic: Layers,
-  task: SquareCheck,
-  subtask: GitBranch,
-};
-
-interface CreateFormWrapperProps {
-  type: CreateType;
-  defaultStatus?: string;
-  onClose: () => void;
-  onCreated: () => void;
-  epics: Epic[];
-  parentTasks: Task[];
-}
-
-function CreateFormWrapper({
-  type,
-  defaultStatus,
-  onClose,
-  onCreated,
-  epics,
-  parentTasks,
-}: CreateFormWrapperProps) {
-  const { form, isSubmitting, handleSubmit } = useCreateForm({
-    type,
-    defaultStatus,
-    onClose,
-    onCreated,
-  });
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div className="px-4 mt-8">
-        <CreateForm
-          form={form}
-          type={type}
-          epics={epics}
-          parentTasks={parentTasks}
-        />
-      </div>
-
-      <div className="flex justify-end gap-2 p-4 border-t mt-4">
-        <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Creating..." : "Create"}
-        </Button>
-      </div>
-    </form>
-  );
-}
+const TYPE_OPTIONS = [
+  { value: "epic", label: "Epic", icon: Layers },
+  { value: "task", label: "Task", icon: SquareCheck },
+  { value: "subtask", label: "Subtask", icon: GitBranch },
+] as const;
 
 export function CreateModal({
   open,
@@ -93,31 +46,41 @@ export function CreateModal({
   tasks,
   defaultStatus,
   defaultType,
-}: CreateModalProps) {
+}: CreateDrawerProps) {
   const [type, setType] = useState<CreateType>("task");
+  const parentTasks = tasks.filter((t) => !t.parentTaskId);
 
-  // Reset type when modal opens
+  const { form, isSubmitting, handleSubmit } = useCreateForm({
+    type,
+    defaultStatus,
+    onClose,
+    onCreated,
+  });
+
   useEffect(() => {
     if (open) {
       setType(defaultType || "task");
     }
   }, [open, defaultType]);
 
-  const parentTasks = tasks.filter((t) => !t.parentTaskId);
-  const Icon = TYPE_ICONS[type];
+  const Icon = TYPE_OPTIONS.find((t) => t.value === type)?.icon || SquareCheck;
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="p-0 max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="shrink-0">
-          <DialogTitle className="flex items-center gap-2 border-b p-4">
+    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent side="right" className="p-0 flex flex-col w-full sm:max-w-md">
+        <SheetHeader className="shrink-0 border-b p-4">
+          <SheetTitle className="flex items-center gap-2">
             <Icon className="h-5 w-5" />
             Create New {type.charAt(0).toUpperCase() + type.slice(1)}
-          </DialogTitle>
-        </DialogHeader>
+          </SheetTitle>
+        </SheetHeader>
 
-        <ScrollArea className="flex-1 overflow-auto">
-          <div className="space-y-2 px-4 pt-2">
+        <form
+          id="create-form"
+          onSubmit={handleSubmit}
+          className="flex-1 overflow-y-auto p-4 space-y-4"
+        >
+          <div className="space-y-2">
             <Label>Type</Label>
             <Select
               value={type}
@@ -127,39 +90,36 @@ export function CreateModal({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="epic">
-                  <div className="flex items-center gap-2">
-                    <Layers className="h-4 w-4" />
-                    Epic
-                  </div>
-                </SelectItem>
-                <SelectItem value="task">
-                  <div className="flex items-center gap-2">
-                    <SquareCheck className="h-4 w-4" />
-                    Task
-                  </div>
-                </SelectItem>
-                <SelectItem value="subtask">
-                  <div className="flex items-center gap-2">
-                    <GitBranch className="h-4 w-4" />
-                    Subtask
-                  </div>
-                </SelectItem>
+                {TYPE_OPTIONS.map(({ value, label, icon: TypeIcon }) => (
+                  <SelectItem key={value} value={value}>
+                    <div className="flex items-center gap-2">
+                      <TypeIcon className="h-4 w-4" />
+                      {label}
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
-          <CreateFormWrapper
+          <CreateForm
             key={type}
+            form={form}
             type={type}
-            defaultStatus={defaultStatus}
-            onClose={onClose}
-            onCreated={onCreated}
             epics={epics}
             parentTasks={parentTasks}
           />
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+        </form>
+
+        <SheetFooter className="shrink-0 border-t p-4">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" form="create-form" disabled={isSubmitting}>
+            {isSubmitting ? "Creating..." : "Create"}
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

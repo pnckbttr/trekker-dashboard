@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, Archive } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Task, Epic } from "@/types";
@@ -16,6 +16,7 @@ interface KanbanColumnProps {
   onAddClick: () => void;
   onTaskClick: (task: Task) => void;
   onEpicClick: (epic: Epic) => void;
+  onArchiveAll?: () => void;
 }
 
 export function KanbanColumn({
@@ -27,6 +28,7 @@ export function KanbanColumn({
   onAddClick,
   onTaskClick,
   onEpicClick,
+  onArchiveAll,
 }: KanbanColumnProps) {
   const totalCount = tasks.length + epics.length;
 
@@ -57,15 +59,28 @@ export function KanbanColumn({
             {totalCount}
           </Badge>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={onAddClick}
-          title={`Add task to ${label}`}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          {onArchiveAll && totalCount > 0 && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={onArchiveAll}
+              title="Archive all completed items"
+            >
+              <Archive className="h-4 w-4" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={onAddClick}
+            title={`Add task to ${label}`}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Column Content */}

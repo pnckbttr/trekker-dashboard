@@ -128,6 +128,27 @@ export function useDeleteTask() {
   });
 }
 
+export function useBulkArchiveCompleted() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/bulk-archive-completed", {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to archive completed items");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["epics"] });
+    },
+  });
+}
+
 export function useCreateEpic() {
   const queryClient = useQueryClient();
 

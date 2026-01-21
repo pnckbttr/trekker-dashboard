@@ -16,6 +16,7 @@ interface KanbanBoardProps {
   onAddClick: (status: string) => void;
   onTaskClick: (task: Task) => void;
   onEpicClick: (epic: Epic) => void;
+  onArchiveAllCompleted?: () => void;
 }
 
 export function KanbanBoard({
@@ -24,6 +25,7 @@ export function KanbanBoard({
   onAddClick,
   onTaskClick,
   onEpicClick,
+  onArchiveAllCompleted,
 }: KanbanBoardProps) {
   const topLevelTasks = tasks.filter((task) => !task.parentTaskId);
 
@@ -46,6 +48,7 @@ export function KanbanBoard({
           onAddClick={() => onAddClick(column.key)}
           onTaskClick={onTaskClick}
           onEpicClick={onEpicClick}
+          onArchiveAll={column.key === "completed" ? onArchiveAllCompleted : undefined}
         />
       ))}
     </div>

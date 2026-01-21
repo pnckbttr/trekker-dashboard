@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -60,6 +61,11 @@ export function useCreateForm({
     resolver: zodResolver(getSchema(type)),
     defaultValues: getDefaultValues(type, defaultStatus),
   });
+
+  // Reset form when type changes
+  useEffect(() => {
+    form.reset(getDefaultValues(type, defaultStatus));
+  }, [type, defaultStatus, form]);
 
   const {
     formState: { isSubmitting },
