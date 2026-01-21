@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import { ArrowLeftToLine, ArrowRightFromLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionHeader } from "@/components/shared";
 import type { Task } from "@/types";
@@ -19,17 +19,21 @@ interface TaskLinkProps {
 }
 
 function TaskLink({ taskId, variant, onClick }: TaskLinkProps) {
+  const Icon = variant === "depends" ? ArrowLeftToLine : ArrowRightFromLine;
+
   return (
     <button
       className={cn(
-        "flex items-center gap-0.5 text-sm hover:underline",
-        variant === "depends" && "text-yellow-600 dark:text-yellow-400",
-        variant === "blocks" && "text-red-600 dark:text-red-400"
+        "inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-mono",
+        "transition-colors hover:ring-1",
+        variant === "depends" && "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:ring-amber-500/50",
+        variant === "blocks" && "bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:ring-rose-500/50"
       )}
       onClick={onClick}
+      title={variant === "depends" ? "Depends on this task" : "Blocks this task"}
     >
-      <span className="font-mono">{taskId}</span>
-      <ChevronRight className="h-3 w-3" />
+      <Icon className="h-3 w-3" />
+      {taskId}
     </button>
   );
 }
@@ -55,43 +59,45 @@ export function LinksSection({
 
   return (
     <div>
-      <SectionHeader>Links</SectionHeader>
+      <SectionHeader>Dependencies</SectionHeader>
 
-      {dependsOn.length > 0 && (
-        <div className="mb-2">
-          <span className="text-xs text-muted-foreground mb-1 block">
-            Depends on
-          </span>
-          <div className="space-y-1">
-            {dependsOn.map((depId) => (
-              <TaskLink
-                key={depId}
-                taskId={depId}
-                variant="depends"
-                onClick={() => handleTaskClick(depId)}
-              />
-            ))}
+      <div className="space-y-2">
+        {dependsOn.length > 0 && (
+          <div>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Depends on
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {dependsOn.map((depId) => (
+                <TaskLink
+                  key={depId}
+                  taskId={depId}
+                  variant="depends"
+                  onClick={() => handleTaskClick(depId)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {blocks.length > 0 && (
-        <div>
-          <span className="text-xs text-muted-foreground mb-1 block">
-            Blocks
-          </span>
-          <div className="space-y-1">
-            {blocks.map((blockId) => (
-              <TaskLink
-                key={blockId}
-                taskId={blockId}
-                variant="blocks"
-                onClick={() => handleTaskClick(blockId)}
-              />
-            ))}
+        {blocks.length > 0 && (
+          <div>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1.5 block">
+              Blocks
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {blocks.map((blockId) => (
+                <TaskLink
+                  key={blockId}
+                  taskId={blockId}
+                  variant="blocks"
+                  onClick={() => handleTaskClick(blockId)}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

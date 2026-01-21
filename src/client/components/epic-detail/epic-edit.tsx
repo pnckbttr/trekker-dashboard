@@ -2,6 +2,7 @@
 
 import { UseFormReturn } from "react-hook-form";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,12 +59,13 @@ export function EpicEdit({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-lg p-0 gap-0">
+      <DialogContent className="max-w-lg p-0 gap-0 max-h-[90vh] overflow-hidden">
         <div className="flex items-center p-4 border-b">
           <Breadcrumb items={breadcrumbItems} />
         </div>
 
-        <form id="epic-edit-form" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 p-4">
+        <ScrollArea className="max-h-[calc(90vh-140px)]">
+          <form id="epic-edit-form" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 p-4">
 
           {/* Title */}
           <div className="space-y-2">
@@ -130,7 +132,8 @@ export function EpicEdit({
             </div>
           </div>
 
-        </form>
+          </form>
+        </ScrollArea>
 
         {/* Footer with actions */}
         <div className="p-4 border-t flex items-center justify-between">

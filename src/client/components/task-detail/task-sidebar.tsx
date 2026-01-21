@@ -1,9 +1,14 @@
 "use client";
 
+import { useState } from "react";
+import { MessageSquare, History } from "lucide-react";
 import { DetailsSection, LinksSection, SubtasksSection } from "./sidebar";
 import { Metadata } from "@/components/shared";
-import type { Task, Epic } from "@/types";
 import { CommentSection } from "../comment-section";
+import { HistoryTab } from "./history-tab";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { Task, Epic } from "@/types";
 
 interface TaskSidebarProps {
   task: Task;
@@ -16,6 +21,8 @@ interface TaskSidebarProps {
   getTaskById: (id: string) => Task | undefined;
 }
 
+type TabType = "comments" | "history";
+
 export function TaskSidebar({
   task,
   subtasks,
@@ -26,6 +33,8 @@ export function TaskSidebar({
   getEpicById,
   getTaskById,
 }: TaskSidebarProps) {
+  const [activeTab, setActiveTab] = useState<TabType>("comments");
+
   return (
     <div className="bg-muted/50 rounded-b-md">
       <div className="p-4 space-y-6">
@@ -48,8 +57,41 @@ export function TaskSidebar({
         <Metadata createdAt={task.createdAt} updatedAt={task.updatedAt} />
       </div>
 
+      {/* Tabs */}
+      <div className="border-t">
+        <div className="flex border-b">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "flex-1 rounded-none",
+              activeTab === "comments" && "bg-accent",
+            )}
+            onClick={() => setActiveTab("comments")}
+          >
+            <MessageSquare className="h-4 w-4 mr-1.5" />
+            Comments
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "flex-1 rounded-none",
+              activeTab === "history" && "bg-accent",
+            )}
+            onClick={() => setActiveTab("history")}
+          >
+            <History className="h-4 w-4 mr-1.5" />
+            History
+          </Button>
+        </div>
 
-      <CommentSection taskId={task.id} />
+        {activeTab === "comments" ? (
+          <CommentSection taskId={task.id} />
+        ) : (
+          <HistoryTab taskId={task.id} />
+        )}
+      </div>
     </div>
   );
 }

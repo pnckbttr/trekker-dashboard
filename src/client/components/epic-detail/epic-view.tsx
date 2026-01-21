@@ -5,6 +5,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Breadcrumb, BreadcrumbItem } from "@/components/breadcrumb";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { EpicSidebar } from "./epic-sidebar";
 
 interface Task {
@@ -77,7 +78,7 @@ export function EpicView({
                 Description
               </h4>
               {epic.description ? (
-                <p className="text-sm whitespace-pre-wrap">{epic.description}</p>
+                <MarkdownRenderer content={epic.description} />
               ) : (
                 <p className="text-sm text-muted-foreground italic">
                   No description

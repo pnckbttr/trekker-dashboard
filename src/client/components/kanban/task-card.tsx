@@ -6,7 +6,7 @@ import type { Task } from "@/types";
 import { getCardType } from "@/lib/constants";
 import { PriorityBadge } from "@/components/priority-badge";
 import { SubtaskProgress } from "@/components/subtask-progress";
-import { Layers, SquareCheck } from "lucide-react";
+import { Layers, SquareCheck, ArrowLeftToLine, ArrowRightFromLine } from "lucide-react";
 
 interface TaskCardProps {
   task: Task;
@@ -65,17 +65,27 @@ export function TaskCard({ task, epicName, subtasks, onClick }: TaskCardProps) {
       )}
 
       {(task.dependsOn.length > 0 || task.blocks.length > 0) && (
-        <div className="pt-2 border-t">
-          {task.dependsOn.length > 0 && (
-            <p className="text-xs text-yellow-600 dark:text-yellow-400">
-              Depends: {task.dependsOn.join(", ")}
-            </p>
-          )}
-          {task.blocks.length > 0 && (
-            <p className="text-xs text-red-600 dark:text-red-400">
-              Blocks: {task.blocks.join(", ")}
-            </p>
-          )}
+        <div className="pt-2 border-t flex flex-wrap gap-1">
+          {task.dependsOn.map((depId) => (
+            <span
+              key={depId}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-500/10 text-amber-600 dark:text-amber-400"
+              title={`Depends on ${depId}`}
+            >
+              <ArrowLeftToLine className="h-2.5 w-2.5" />
+              {depId}
+            </span>
+          ))}
+          {task.blocks.map((blockId) => (
+            <span
+              key={blockId}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-rose-500/10 text-rose-600 dark:text-rose-400"
+              title={`Blocks ${blockId}`}
+            >
+              <ArrowRightFromLine className="h-2.5 w-2.5" />
+              {blockId}
+            </span>
+          ))}
         </div>
       )}
 

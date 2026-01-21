@@ -1,57 +1,13 @@
+import { Routes, Route } from "react-router-dom";
 import { useAppData } from "@/hooks/use-data";
-import { useTaskEvents } from "@/hooks/use-task-events";
 import { useUIStore } from "@/stores";
 import { AppHeader } from "@/components/app-header";
-import { KanbanBoard } from "@/components/kanban";
-import { TaskDetailModal } from "@/components/task-detail";
-import { EpicDetailModal } from "@/components/epic-detail";
-import { CreateModal } from "@/components/create-modal";
 import { ConnectionIndicator } from "@/components/shared/connection-indicator";
+import { KanbanPage, ListPage, HistoryPage } from "@/pages";
 
 export function App() {
-  const { tasks, epics, project, isLoading, error, refetch } = useAppData();
-  const {
-    selectedTaskId,
-    selectedEpicId,
-    showCreateModal,
-    createModalDefaults,
-    connectionStatus,
-    openTaskDetail,
-    openEpicDetail,
-    openCreateModal,
-    closeTaskDetail,
-    closeEpicDetail,
-    closeCreateModal,
-  } = useUIStore();
-
-  // Subscribe to SSE events
-  useTaskEvents(refetch);
-
-  const selectedTask = selectedTaskId
-    ? tasks.find((t) => t.id === selectedTaskId) || null
-    : null;
-
-  const selectedEpic = selectedEpicId
-    ? epics.find((e) => e.id === selectedEpicId) || null
-    : null;
-
-  if (isLoading && tasks.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <span className="text-muted-foreground">Loading...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <span className="text-destructive">
-          Error: {error instanceof Error ? error.message : "Unknown error"}
-        </span>
-      </div>
-    );
-  }
+  const { tasks, epics, project } = useAppData();
+  const { connectionStatus, openCreateModal } = useUIStore();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -60,15 +16,11 @@ export function App() {
         onNewClick={() => openCreateModal({ status: "todo" })}
       />
 
-      <main className="flex-1 p-4 overflow-x-auto">
-        <KanbanBoard
-          tasks={tasks}
-          epics={epics}
-          onAddClick={(status) => openCreateModal({ status })}
-          onTaskClick={(task) => openTaskDetail(task.id)}
-          onEpicClick={(epic) => openEpicDetail(epic.id)}
-        />
-      </main>
+      <Routes>
+        <Route path="/" element={<KanbanPage />} />
+        <Route path="/list" element={<ListPage />} />
+        <Route path="/history" element={<HistoryPage />} />
+      </Routes>
 
       <footer className="px-4 py-2 border-t">
         <div className="flex items-center justify-between">
@@ -78,43 +30,6 @@ export function App() {
           <ConnectionIndicator status={connectionStatus} />
         </div>
       </footer>
-
-      {/* Modals */}
-      <TaskDetailModal
-        task={selectedTask}
-        epics={epics}
-        allTasks={tasks}
-        open={selectedTask !== null}
-        onClose={closeTaskDetail}
-        onUpdate={refetch}
-        onTaskClick={(task) => openTaskDetail(task.id)}
-        onEpicClick={(epic) => {
-          closeTaskDetail();
-          openEpicDetail(epic.id);
-        }}
-      />
-
-      <EpicDetailModal
-        epic={selectedEpic}
-        tasks={selectedEpic ? tasks.filter((t) => t.epicId === selectedEpic.id) : []}
-        open={selectedEpic !== null}
-        onClose={closeEpicDetail}
-        onUpdate={refetch}
-        onTaskClick={(task) => {
-          closeEpicDetail();
-          const fullTask = tasks.find((t) => t.id === task.id);
-          if (fullTask) openTaskDetail(fullTask.id);
-        }}
-      />
-
-      <CreateModal
-        open={showCreateModal}
-        onClose={closeCreateModal}
-        onCreated={refetch}
-        epics={epics}
-        tasks={tasks}
-        defaultStatus={createModalDefaults.status || "todo"}
-      />
     </div>
   );
 }

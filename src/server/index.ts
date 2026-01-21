@@ -10,6 +10,9 @@ import commentsRoutes from "./routes/comments";
 import dependenciesRoutes from "./routes/dependencies";
 import projectRoutes from "./routes/project";
 import eventsRoutes from "./routes/events";
+import searchRoutes from "./routes/search";
+import listRoutes from "./routes/list";
+import historyRoutes from "./routes/history";
 
 const app = new Hono();
 
@@ -28,6 +31,9 @@ app.route("/api/comments", commentsRoutes);
 app.route("/api/dependencies", dependenciesRoutes);
 app.route("/api/project", projectRoutes);
 app.route("/api/events", eventsRoutes);
+app.route("/api/search", searchRoutes);
+app.route("/api/list", listRoutes);
+app.route("/api/history", historyRoutes);
 
 // Serve static files in production
 const scriptDir = dirname(import.meta.url.replace("file://", ""));

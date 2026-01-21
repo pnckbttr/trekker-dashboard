@@ -2,6 +2,7 @@
 
 import { UseFormReturn } from "react-hook-form";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,12 +64,13 @@ export function TaskEdit({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-lg p-0 gap-0">
+      <DialogContent className="max-w-lg p-0 gap-0 max-h-[90vh] overflow-hidden">
         <div className="flex items-center border-b p-4">
           <Breadcrumb items={breadcrumbItems} />
         </div>
 
-        <form id="task-edit-form" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 p-4">
+        <ScrollArea className="max-h-[calc(90vh-140px)]">
+          <form id="task-edit-form" onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 p-4">
           {/* Title */}
           <div className="space-y-2">
             <Label>Title</Label>
@@ -166,7 +168,8 @@ export function TaskEdit({
           </div>
 
           {/* Footer with actions */}
-        </form>
+          </form>
+        </ScrollArea>
 
         <div className="p-4 border-t flex items-center justify-between">
           <DeleteConfirmation

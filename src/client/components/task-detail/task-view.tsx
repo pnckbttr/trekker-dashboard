@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Breadcrumb, BreadcrumbItem } from "@/components/breadcrumb";
 import { CommentSection } from "@/components/comment-section";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 import { TaskSidebar } from "./task-sidebar";
 import type { Task, Epic } from "@/types";
 
@@ -68,7 +69,7 @@ export function TaskView({
                 Description
               </h4>
               {task.description ? (
-                <p className="text-sm whitespace-pre-wrap">{task.description}</p>
+                <MarkdownRenderer content={task.description} />
               ) : (
                 <p className="text-sm text-muted-foreground italic">
                   No description

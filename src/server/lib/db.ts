@@ -7,12 +7,13 @@ import {
   comments,
   dependencies,
   idCounters,
+  events,
 } from "./schema";
 
 // Re-export schema
-export { projects, epics, tasks, comments, dependencies, idCounters };
+export { projects, epics, tasks, comments, dependencies, idCounters, events };
 
-const schema = { projects, epics, tasks, comments, dependencies, idCounters };
+const schema = { projects, epics, tasks, comments, dependencies, idCounters, events };
 
 // Infer types from schema
 export type Project = typeof projects.$inferSelect;
@@ -36,4 +37,11 @@ export function getDb() {
   sqliteInstance = new Database(dbPath);
   db = drizzle(sqliteInstance, { schema });
   return db;
+}
+
+export function getSqliteInstance() {
+  if (!sqliteInstance) {
+    getDb(); // Initialize if not already
+  }
+  return sqliteInstance;
 }

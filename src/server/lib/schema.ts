@@ -58,3 +58,14 @@ export const idCounters = sqliteTable("id_counters", {
   entityType: text("entity_type").primaryKey(),
   counter: integer("counter").notNull().default(0),
 });
+
+// Events table for history/logbook
+export const events = sqliteTable("events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  action: text("action").notNull(), // create, update, delete
+  entityType: text("entity_type").notNull(), // epic, task, subtask, comment, dependency
+  entityId: text("entity_id").notNull(),
+  snapshot: text("snapshot"), // Full JSON for create/delete
+  changes: text("changes"), // JSON diff for update
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});

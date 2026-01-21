@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { taskFormSchema, TaskFormData } from "./schema";
@@ -16,6 +17,7 @@ interface UseTaskFormOptions {
 }
 
 export function useTaskForm({ task, open, isEditing, onClose, onUpdate }: UseTaskFormOptions) {
+  const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const form = useForm<TaskFormData>({
@@ -71,6 +73,7 @@ export function useTaskForm({ task, open, isEditing, onClose, onUpdate }: UseTas
 
       toast.success("Task updated");
       onUpdate();
+      queryClient.invalidateQueries({ queryKey: ["history"] });
       return true;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update task");
@@ -94,6 +97,7 @@ export function useTaskForm({ task, open, isEditing, onClose, onUpdate }: UseTas
       toast.success("Task deleted");
       onClose();
       onUpdate();
+      queryClient.invalidateQueries({ queryKey: ["history"] });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete task");
     }
@@ -119,6 +123,7 @@ export function useTaskForm({ task, open, isEditing, onClose, onUpdate }: UseTas
       }
 
       onUpdate();
+      queryClient.invalidateQueries({ queryKey: ["history"] });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update status");
     }
@@ -144,6 +149,7 @@ export function useTaskForm({ task, open, isEditing, onClose, onUpdate }: UseTas
       }
 
       onUpdate();
+      queryClient.invalidateQueries({ queryKey: ["history"] });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update priority");
     }

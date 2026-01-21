@@ -55,7 +55,7 @@ export function EpicSidebar({
   onTaskClick,
 }: EpicSidebarProps) {
   const epicTasks = tasks.filter((t) => !t.parentTaskId);
-  const completedTasks = epicTasks.filter((t) => t.status === "completed").length;
+  const completedTasks = epicTasks.filter((t) => t.status === "completed" || t.status === "archived" || t.status === "wont_fix").length;
 
   return (
     <div className="p-4 bg-muted/30 rounded-b-md">

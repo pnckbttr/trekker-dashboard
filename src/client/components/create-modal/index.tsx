@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -63,7 +64,7 @@ function CreateFormWrapper({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="px-4">
+      <div className="px-4 mt-8">
         <CreateForm
           form={form}
           type={type}
@@ -107,53 +108,57 @@ export function CreateModal({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="p-0">
-        <DialogHeader>
+      <DialogContent className="p-0 max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2 border-b p-4">
             <Icon className="h-5 w-5" />
             Create New {type.charAt(0).toUpperCase() + type.slice(1)}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-2 px-4">
-          <Label>Type</Label>
-          <Select value={type} onValueChange={(v) => setType(v as CreateType)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="epic">
-                <div className="flex items-center gap-2">
-                  <Layers className="h-4 w-4" />
-                  Epic
-                </div>
-              </SelectItem>
-              <SelectItem value="task">
-                <div className="flex items-center gap-2">
-                  <SquareCheck className="h-4 w-4" />
-                  Task
-                </div>
-              </SelectItem>
-              <SelectItem value="subtask">
-                <div className="flex items-center gap-2">
-                  <GitBranch className="h-4 w-4" />
-                  Subtask
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <ScrollArea className="flex-1 overflow-auto">
+          <div className="space-y-2 px-4 pt-2">
+            <Label>Type</Label>
+            <Select
+              value={type}
+              onValueChange={(v) => setType(v as CreateType)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="epic">
+                  <div className="flex items-center gap-2">
+                    <Layers className="h-4 w-4" />
+                    Epic
+                  </div>
+                </SelectItem>
+                <SelectItem value="task">
+                  <div className="flex items-center gap-2">
+                    <SquareCheck className="h-4 w-4" />
+                    Task
+                  </div>
+                </SelectItem>
+                <SelectItem value="subtask">
+                  <div className="flex items-center gap-2">
+                    <GitBranch className="h-4 w-4" />
+                    Subtask
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-
-        <CreateFormWrapper
-          key={type}
-          type={type}
-          defaultStatus={defaultStatus}
-          onClose={onClose}
-          onCreated={onCreated}
-          epics={epics}
-          parentTasks={parentTasks}
-        />
+          <CreateFormWrapper
+            key={type}
+            type={type}
+            defaultStatus={defaultStatus}
+            onClose={onClose}
+            onCreated={onCreated}
+            epics={epics}
+            parentTasks={parentTasks}
+          />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

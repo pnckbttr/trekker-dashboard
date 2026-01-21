@@ -8,7 +8,6 @@ const STATUS_COLUMNS = [
   { key: "in_progress", label: "In Progress" },
   { key: "completed", label: "Completed" },
   { key: "wont_fix", label: "Won't Fix" },
-  { key: "archived", label: "Archived" },
 ] as const;
 
 interface KanbanBoardProps {
