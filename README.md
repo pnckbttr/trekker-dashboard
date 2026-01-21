@@ -8,7 +8,7 @@ A kanban board dashboard for [Trekker](https://github.com/obsfx/trekker) issue t
 bun install -g @obsfx/trekker-dashboard
 ```
 
-Or with npm:
+Or with npm (still requires Bun runtime to run):
 
 ```bash
 npm install -g @obsfx/trekker-dashboard
@@ -32,8 +32,26 @@ trekker-dashboard --help     # Show help
 
 ## Requirements
 
+- **Bun runtime** (required) - The dashboard uses Bun's native SQLite driver
 - A project initialized with Trekker (`trekker init`)
-- Bun runtime (for best performance) or Node.js 18+
+
+### Installing Bun
+
+```bash
+# macOS/Linux
+curl -fsSL https://bun.sh/install | bash
+
+# Homebrew
+brew install oven-sh/bun/bun
+
+# Windows (scoop)
+scoop install bun
+
+# npm (any platform)
+npm install -g bun
+```
+
+See [bun.sh/docs/installation](https://bun.sh/docs/installation) for more options.
 
 ## Features
 
