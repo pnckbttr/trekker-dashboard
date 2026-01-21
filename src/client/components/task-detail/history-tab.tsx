@@ -1,55 +1,20 @@
 "use client";
 
-import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useHistory, HistoryEvent, HistoryAction } from "@/hooks/use-history";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/date";
+import { ActionIcon, getActionColor } from "@/components/shared";
 
 interface HistoryTabProps {
   taskId: string;
 }
 
-function formatRelativeTime(date: string): string {
-  const now = new Date();
-  const then = new Date(date);
-  const diffMs = now.getTime() - then.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return then.toLocaleDateString();
-}
-
-function getActionIcon(action: HistoryAction) {
-  switch (action) {
-    case "create":
-      return <Plus className="h-3.5 w-3.5 text-green-500" />;
-    case "update":
-      return <Pencil className="h-3.5 w-3.5 text-blue-500" />;
-    case "delete":
-      return <Trash2 className="h-3.5 w-3.5 text-red-500" />;
-  }
-}
-
-function getActionColor(action: HistoryAction) {
-  switch (action) {
-    case "create":
-      return "text-green-500";
-    case "update":
-      return "text-blue-500";
-    case "delete":
-      return "text-red-500";
-  }
-}
-
 function HistoryEventItem({ event }: { event: HistoryEvent }) {
   return (
     <div className="flex gap-2.5 py-2.5 border-b last:border-b-0">
-      <div className="mt-0.5">{getActionIcon(event.action)}</div>
+      <div className="mt-0.5">
+        <ActionIcon action={event.action} className="h-3.5 w-3.5" />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <span className={cn("text-xs font-medium capitalize", getActionColor(event.action))}>

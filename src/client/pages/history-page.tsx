@@ -23,6 +23,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/date";
+import { ActionIcon, getActionColor } from "@/components/shared";
 
 const TYPE_OPTIONS: { value: HistoryEntityType; label: string }[] = [
   { value: "epic", label: "Epic" },
@@ -37,43 +39,6 @@ const ACTION_OPTIONS: { value: HistoryAction; label: string; icon: typeof Plus }
   { value: "update", label: "Updated", icon: Pencil },
   { value: "delete", label: "Deleted", icon: Trash2 },
 ];
-
-function formatRelativeTime(date: string): string {
-  const now = new Date();
-  const then = new Date(date);
-  const diffMs = now.getTime() - then.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return then.toLocaleDateString();
-}
-
-function getActionIcon(action: HistoryAction) {
-  switch (action) {
-    case "create":
-      return <Plus className="h-4 w-4 text-green-500" />;
-    case "update":
-      return <Pencil className="h-4 w-4 text-blue-500" />;
-    case "delete":
-      return <Trash2 className="h-4 w-4 text-red-500" />;
-  }
-}
-
-function getActionColor(action: HistoryAction) {
-  switch (action) {
-    case "create":
-      return "text-green-500";
-    case "update":
-      return "text-blue-500";
-    case "delete":
-      return "text-red-500";
-  }
-}
 
 function EventItem({
   event,
@@ -92,7 +57,9 @@ function EventItem({
 
   return (
     <div className="flex gap-3 p-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors">
-      <div className="mt-0.5">{getActionIcon(event.action)}</div>
+      <div className="mt-0.5">
+        <ActionIcon action={event.action} />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <button

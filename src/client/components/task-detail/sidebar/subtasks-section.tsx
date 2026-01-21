@@ -1,23 +1,10 @@
 "use client";
 
-import { Square, SquareCheck as CheckSquare, Archive, SquareX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SectionHeader } from "@/components/shared";
+import { isTerminalStatus } from "@/lib/status";
+import { SectionHeader, StatusIcon } from "@/components/shared";
 import type { Task } from "@/types";
-
-function getStatusIcon(status: string) {
-  switch (status) {
-    case "completed":
-      return <CheckSquare className="h-4 w-4 text-green-500 shrink-0" />;
-    case "archived":
-      return <Archive className="h-4 w-4 text-gray-400 shrink-0" />;
-    case "wont_fix":
-      return <SquareX className="h-4 w-4 text-amber-500 shrink-0" />;
-    default:
-      return <Square className="h-4 w-4 opacity-50 shrink-0" />;
-  }
-}
 
 interface SubtasksSectionProps {
   subtasks: Task[];
@@ -30,7 +17,7 @@ interface SubtaskItemProps {
 }
 
 function SubtaskItem({ subtask, onClick }: SubtaskItemProps) {
-  const isDone = subtask.status === "completed" || subtask.status === "archived" || subtask.status === "wont_fix";
+  const isDone = isTerminalStatus(subtask.status);
 
   return (
     <Button
@@ -38,7 +25,7 @@ function SubtaskItem({ subtask, onClick }: SubtaskItemProps) {
       className="w-full justify-start h-auto p-1.5 gap-2"
       onClick={onClick}
     >
-      {getStatusIcon(subtask.status)}
+      <StatusIcon status={subtask.status} />
       <span className="font-mono text-xs text-muted-foreground">
         {subtask.id}
       </span>

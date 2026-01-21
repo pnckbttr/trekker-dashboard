@@ -2,15 +2,8 @@
 
 import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { SectionHeader } from "@/components/shared";
-import { TASK_STATUSES, STATUS_LABELS, PRIORITY_LABELS } from "@/lib/constants";
+import { SectionHeader, StatusSelect, PrioritySelect } from "@/components/shared";
+import { TASK_STATUSES } from "@/lib/constants";
 import type { Task, Epic } from "@/types";
 
 interface DetailsSectionProps {
@@ -45,38 +38,22 @@ export function DetailsSection({
         {/* Status */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Status</span>
-          <Select value={task.status} onValueChange={onStatusChange}>
-            <SelectTrigger className="w-auto h-8 text-right">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {TASK_STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {STATUS_LABELS[s]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <StatusSelect
+            value={task.status}
+            onChange={onStatusChange}
+            statuses={TASK_STATUSES}
+            triggerClassName="w-auto h-8 text-right"
+          />
         </div>
 
         {/* Priority */}
         <div className="flex items-center justify-between">
           <span className="text-sm text-muted-foreground">Priority</span>
-          <Select
-            value={task.priority.toString()}
-            onValueChange={(v) => onPriorityChange(parseInt(v, 10))}
-          >
-            <SelectTrigger className="w-auto h-8 text-right">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-                <SelectItem key={value} value={value}>
-                  P{value} - {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <PrioritySelect
+            value={task.priority}
+            onChange={onPriorityChange}
+            triggerClassName="w-auto h-8 text-right"
+          />
         </div>
 
         {/* Epic */}

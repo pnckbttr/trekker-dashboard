@@ -5,23 +5,7 @@ import { BreadcrumbItem } from "@/components/breadcrumb";
 import { EpicView } from "./epic-view";
 import { EpicEdit } from "./epic-edit";
 import { useEpicForm } from "./use-epic-form";
-
-interface Task {
-  id: string;
-  title: string;
-  status: string;
-  parentTaskId: string | null;
-}
-
-interface Epic {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  priority: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Task, Epic } from "@/types";
 
 interface EpicDetailModalProps {
   epic: Epic | null;

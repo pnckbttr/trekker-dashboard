@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/lib/date";
 import {
   TASK_STATUSES,
   STATUS_LABELS,
@@ -297,7 +298,7 @@ export function ListPage() {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {new Date(item.createdAt).toLocaleDateString()}
+                        {formatDate(item.createdAt)}
                       </td>
                     </tr>
                   ))}

@@ -1,37 +1,17 @@
 "use client";
 
-import { Square, SquareCheck as CheckSquare, Archive, SquareX } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isTerminalStatus } from "@/lib/status";
 import { Button } from "@/components/ui/button";
-
-function getStatusIcon(status: string) {
-  switch (status) {
-    case "completed":
-      return <CheckSquare className="h-4 w-4 text-green-500 shrink-0" />;
-    case "archived":
-      return <Archive className="h-4 w-4 text-gray-400 shrink-0" />;
-    case "wont_fix":
-      return <SquareX className="h-4 w-4 text-amber-500 shrink-0" />;
-    default:
-      return <Square className="h-4 w-4 opacity-50 shrink-0" />;
-  }
-}
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { SectionHeader, Metadata } from "@/components/shared";
-import { EPIC_STATUSES, STATUS_LABELS, PRIORITY_LABELS } from "@/lib/constants";
-
-interface Task {
-  id: string;
-  title: string;
-  status: string;
-  parentTaskId: string | null;
-}
+  SectionHeader,
+  Metadata,
+  StatusIcon,
+  StatusSelect,
+  PrioritySelect,
+} from "@/components/shared";
+import { EPIC_STATUSES } from "@/lib/constants";
+import type { Task } from "@/types";
 
 interface EpicSidebarProps {
   status: string;
@@ -55,7 +35,7 @@ export function EpicSidebar({
   onTaskClick,
 }: EpicSidebarProps) {
   const epicTasks = tasks.filter((t) => !t.parentTaskId);
-  const completedTasks = epicTasks.filter((t) => t.status === "completed" || t.status === "archived" || t.status === "wont_fix").length;
+  const completedTasks = epicTasks.filter((t) => isTerminalStatus(t.status)).length;
 
   return (
     <div className="p-4 bg-muted/30 rounded-b-md">
@@ -67,37 +47,21 @@ export function EpicSidebar({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Status</span>
-              <Select value={status} onValueChange={onStatusChange}>
-                <SelectTrigger className="w-auto h-8 text-right">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {EPIC_STATUSES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {STATUS_LABELS[s]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <StatusSelect
+                value={status}
+                onChange={onStatusChange}
+                statuses={EPIC_STATUSES}
+                triggerClassName="w-auto h-8 text-right"
+              />
             </div>
 
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Priority</span>
-              <Select
-                value={priority.toString()}
-                onValueChange={(v) => onPriorityChange(parseInt(v, 10))}
-              >
-                <SelectTrigger className="w-auto h-8 text-right">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      P{value} - {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <PrioritySelect
+                value={priority}
+                onChange={onPriorityChange}
+                triggerClassName="w-auto h-8 text-right"
+              />
             </div>
           </div>
         </div>
@@ -110,7 +74,7 @@ export function EpicSidebar({
             </SectionHeader>
             <div className="space-y-1">
               {epicTasks.map((task) => {
-                const isDone = task.status === "completed" || task.status === "archived" || task.status === "wont_fix";
+                const isDone = isTerminalStatus(task.status);
                 return (
                   <Button
                     key={task.id}
@@ -118,7 +82,7 @@ export function EpicSidebar({
                     className="w-full justify-start h-auto p-1.5 gap-2"
                     onClick={() => onTaskClick?.(task)}
                   >
-                    {getStatusIcon(task.status)}
+                    <StatusIcon status={task.status} />
                     <span className="font-mono text-xs text-muted-foreground">
                       {task.id}
                     </span>
