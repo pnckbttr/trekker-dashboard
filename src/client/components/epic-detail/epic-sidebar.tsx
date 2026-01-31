@@ -35,7 +35,9 @@ export function EpicSidebar({
   onTaskClick,
 }: EpicSidebarProps) {
   const epicTasks = tasks.filter((t) => !t.parentTaskId);
-  const completedTasks = epicTasks.filter((t) => isTerminalStatus(t.status)).length;
+  const completedTasks = epicTasks.filter((t) =>
+    isTerminalStatus(t.status),
+  ).length;
 
   return (
     <div className="p-4 bg-muted/30 rounded-b-md">
@@ -69,7 +71,9 @@ export function EpicSidebar({
         {/* Tasks section */}
         {epicTasks.length > 0 && (
           <div>
-            <SectionHeader count={{ current: completedTasks, total: epicTasks.length }}>
+            <SectionHeader
+              count={{ current: completedTasks, total: epicTasks.length }}
+            >
               Tasks
             </SectionHeader>
             <div className="space-y-1">
@@ -88,8 +92,8 @@ export function EpicSidebar({
                     </span>
                     <span
                       className={cn(
-                        "text-sm flex-1 text-left truncate",
-                        isDone && "line-through text-muted-foreground"
+                        "text-sm flex-1 text-left truncate min-w-0",
+                        isDone && "line-through text-muted-foreground",
                       )}
                     >
                       {task.title}
