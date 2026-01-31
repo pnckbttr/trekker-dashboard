@@ -83,16 +83,16 @@ export function EpicSidebar({
                   <Button
                     key={task.id}
                     variant="ghost"
-                    className="w-full justify-start h-auto p-1.5 gap-2"
+                    className="w-full justify-start h-auto p-1.5 gap-2 whitespace-normal"
                     onClick={() => onTaskClick?.(task)}
                   >
                     <StatusIcon status={task.status} />
-                    <span className="font-mono text-xs text-muted-foreground">
+                    <span className="font-mono text-xs text-muted-foreground shrink-0">
                       {task.id}
                     </span>
                     <span
                       className={cn(
-                        "text-sm flex-1 text-left truncate min-w-0",
+                        "text-sm flex-1 text-left wrap-break-words",
                         isDone && "line-through text-muted-foreground",
                       )}
                     >
