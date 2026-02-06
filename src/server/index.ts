@@ -9,6 +9,7 @@ import epicsRoutes from "./routes/epics";
 import commentsRoutes from "./routes/comments";
 import dependenciesRoutes from "./routes/dependencies";
 import projectRoutes from "./routes/project";
+import projectsRoutes from "./routes/projects";
 import eventsRoutes from "./routes/events";
 import searchRoutes from "./routes/search";
 import listRoutes from "./routes/list";
@@ -17,12 +18,25 @@ import archiveRoutes from "./routes/archive";
 import configRoutes from "./routes/config";
 import bulkDeleteRoutes from "./routes/bulk-delete";
 import { errorHandler } from "./middleware/error-handler";
-import { loadConfig } from "./config/loader.js";
+import { loadConfig, getDefaultProject } from "./config/loader.js";
+import { dbManager } from "./lib/database-manager.js";
 
 // Pre-load config at startup for instant API responses
 console.log("Loading configuration...");
-loadConfig();
+const config = loadConfig();
 console.log("Configuration loaded successfully");
+
+// Initialize default project connection if available
+const defaultProject = getDefaultProject();
+if (defaultProject) {
+  console.log(`Initializing default project: ${defaultProject.name} (${defaultProject.id})`);
+  try {
+    dbManager.getConnection(defaultProject.id);
+    console.log("Default project connected successfully");
+  } catch (error) {
+    console.error("Failed to connect to default project:", error);
+  }
+}
 
 const app = new Hono();
 
@@ -40,6 +54,7 @@ app.route("/api/epics", epicsRoutes);
 app.route("/api/comments", commentsRoutes);
 app.route("/api/dependencies", dependenciesRoutes);
 app.route("/api/project", projectRoutes);
+app.route("/api/projects", projectsRoutes);
 app.route("/api/events", eventsRoutes);
 app.route("/api/search", searchRoutes);
 app.route("/api/list", listRoutes);
