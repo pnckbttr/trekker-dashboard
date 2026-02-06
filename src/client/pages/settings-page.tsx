@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useProjectStore, Project } from "../stores/project-store";
 import { Plus, Trash2, Edit2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
-import { ConfirmDialog } from "../components/shared/confirm-dialog";
+import { ConfirmDialog } from "../components/ui/confirm-dialog";
 
 export function SettingsPage() {
   const { projects, addProject, removeProject, updateProject } = useProjectStore();

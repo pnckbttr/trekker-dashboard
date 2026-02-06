@@ -1,6 +1,6 @@
 import { drizzle, BunSQLiteDatabase } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
-import * as schema from "../db/schema.js";
+import * as schema from "./db.js";
 import { getProject } from "../config/loader.js";
 
 interface DatabaseConnection {
