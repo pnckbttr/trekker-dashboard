@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useProjectStore } from "@/stores/project-store";
 
 export type HistoryEntityType = "epic" | "task" | "subtask" | "comment" | "dependency";
 export type HistoryAction = "create" | "update" | "delete";
@@ -32,9 +33,12 @@ export interface HistoryFilters {
   page?: number;
 }
 
-async function fetchHistory(filters: HistoryFilters): Promise<HistoryResponse> {
+async function fetchHistory(filters: HistoryFilters, projectId?: string | null): Promise<HistoryResponse> {
   const params = new URLSearchParams();
 
+  if (projectId) {
+    params.set("projectId", projectId);
+  }
   if (filters.entityId) {
     params.set("entityId", filters.entityId);
   }
@@ -66,8 +70,11 @@ async function fetchHistory(filters: HistoryFilters): Promise<HistoryResponse> {
 }
 
 export function useHistory(filters: HistoryFilters) {
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
+  
   return useQuery({
-    queryKey: ["history", filters],
-    queryFn: () => fetchHistory(filters),
+    queryKey: ["history", activeProjectId, filters],
+    queryFn: () => fetchHistory(filters, activeProjectId),
+    enabled: !!activeProjectId,
   });
 }

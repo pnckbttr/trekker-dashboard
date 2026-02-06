@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAppData } from "@/hooks/use-data";
 import { useUIStore } from "@/stores";
 import { useConfigStore } from "@/stores/config-store";
@@ -21,12 +22,23 @@ export function App() {
   } = useUIStore();
   const fetchConfig = useConfigStore((state) => state.fetchConfig);
   const fetchProjects = useProjectStore((state) => state.fetchProjects);
+  const queryClient = useQueryClient();
 
   // Load config and projects on app start
   useEffect(() => {
     fetchConfig();
     fetchProjects();
   }, [fetchConfig, fetchProjects]);
+
+  // Listen for project switches and invalidate all queries
+  useEffect(() => {
+    const handleProjectSwitch = () => {
+      queryClient.invalidateQueries();
+    };
+    
+    window.addEventListener('project-switched', handleProjectSwitch);
+    return () => window.removeEventListener('project-switched', handleProjectSwitch);
+  }, [queryClient]);
 
   return (
     <div className="min-h-screen flex flex-col">

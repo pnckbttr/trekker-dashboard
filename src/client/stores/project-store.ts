@@ -128,8 +128,8 @@ export const useProjectStore = create<ProjectState>()(
         console.log(`[ProjectStore] Switching to project: ${project.name}`);
         set({ activeProjectId: projectId, error: null });
 
-        // Invalidate all queries when switching projects
-        // This will be handled by React Query in the components
+        // Trigger custom event that components can listen to
+        window.dispatchEvent(new CustomEvent('project-switched', { detail: { projectId } }));
       },
     }),
     {

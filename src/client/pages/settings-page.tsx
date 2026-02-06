@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProjectStore, Project } from "../stores/project-store";
+import { useSearchParams } from "react-router-dom";
 import { Plus, Trash2, Edit2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { ConfirmDialog } from "../components/ui/confirm-dialog";
 
 export function SettingsPage() {
   const { projects, addProject, removeProject, updateProject } = useProjectStore();
+  const [searchParams] = useSearchParams();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -14,6 +16,13 @@ export function SettingsPage() {
     dbPath: "",
     color: "#3b82f6",
   });
+
+  // Check for action=add query param and open form
+  useEffect(() => {
+    if (searchParams.get('action') === 'add') {
+      setShowAddForm(true);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
