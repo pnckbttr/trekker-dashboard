@@ -1,9 +1,8 @@
 import { create } from "zustand";
 
 export interface StatusConfig {
-  key: string;
+  value: string;
   label: string;
-  color: string;
   description?: string;
 }
 
