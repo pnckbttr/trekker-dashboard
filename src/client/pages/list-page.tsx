@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, X, Trash2 } from "lucide-react";
 import { useList, ListFilters, ListEntityType, ListItem } from "@/hooks/use-list";
-import { useAppData } from "@/hooks/use-data";
+import { useAppData, useBulkDelete } from "@/hooks/use-data";
 import { useUIStore } from "@/stores";
 import { TaskDetailModal } from "@/components/task-detail";
 import { EpicDetailModal } from "@/components/epic-detail";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,7 @@ const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
 export function ListPage() {
   const { tasks, epics, refetch } = useAppData();
+  const bulkDelete = useBulkDelete();
   const {
     selectedTaskId,
     selectedEpicId,
@@ -62,6 +64,7 @@ export function ListPage() {
     sort: "created:desc",
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data, isLoading, error } = useList(filters);
 
@@ -72,6 +75,22 @@ export function ListPage() {
   const selectedEpic = selectedEpicId
     ? epics.find((e) => e.id === selectedEpicId) || null
     : null;
+    
+  const buildQueryParams = () => {
+    const params = new URLSearchParams();
+    if (filters.types) params.set("type", filters.types.join(","));
+    if (filters.statuses) params.set("status", filters.statuses.join(","));
+    if (filters.priorities) params.set("priority", filters.priorities.join(","));
+    if (filters.since) params.set("since", filters.since);
+    if (filters.until) params.set("until", filters.until);
+    return params.toString();
+  };
+  
+  const handleBulkDelete = async () => {
+    const queryParams = buildQueryParams();
+    await bulkDelete.mutateAsync(queryParams);
+    setShowDeleteConfirm(false);
+  };
 
   const handleRowClick = (item: ListItem) => {
     if (item.type === "epic") {
@@ -214,6 +233,18 @@ export function ListPage() {
             <Button variant="ghost" size="sm" onClick={clearFilters}>
               <X className="h-4 w-4 mr-1" />
               Clear
+            </Button>
+          )}
+          
+          {/* Bulk delete */}
+          {data && data.items.length > 0 && (
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={() => setShowDeleteConfirm(true)}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete Filtered ({data.total})
             </Button>
           )}
         </div>
@@ -362,6 +393,15 @@ export function ListPage() {
       </main>
 
       {/* Modals */}
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        onOpenChange={setShowDeleteConfirm}
+        title="Delete Filtered Items"
+        description={`Are you sure you want to delete ${data?.total || 0} item(s)? This action cannot be undone.`}
+        confirmLabel="Delete"
+        onConfirm={handleBulkDelete}
+      />
+
       <TaskDetailModal
         task={selectedTask}
         epics={epics}

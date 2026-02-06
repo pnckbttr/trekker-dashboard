@@ -1,22 +1,53 @@
-// Status types
-export const TASK_STATUSES = [
-  "todo",
-  "in_progress",
-  "completed",
-  "wont_fix",
-  "archived",
-] as const;
+// Status types - dynamically loaded from config
+import { getTaskStatuses, getEpicStatuses } from "../config/loader.js";
 
-export type TaskStatus = (typeof TASK_STATUSES)[number];
+// Lazy getters for status arrays
+let _taskStatuses: string[] | null = null;
+let _epicStatuses: string[] | null = null;
 
-export const EPIC_STATUSES = [
-  "todo",
-  "in_progress",
-  "completed",
-  "archived",
-] as const;
+export function getTaskStatusesArray(): string[] {
+  if (!_taskStatuses) {
+    _taskStatuses = getTaskStatuses();
+  }
+  return _taskStatuses;
+}
 
-export type EpicStatus = (typeof EPIC_STATUSES)[number];
+export function getEpicStatusesArray(): string[] {
+  if (!_epicStatuses) {
+    _epicStatuses = getEpicStatuses();
+  }
+  return _epicStatuses;
+}
+
+// For backward compatibility
+export const TASK_STATUSES = new Proxy([] as any[], {
+  get(target, prop) {
+    if (prop === 'length') return getTaskStatusesArray().length;
+    if (typeof prop === 'string' && !isNaN(Number(prop))) {
+      return getTaskStatusesArray()[Number(prop)];
+    }
+    return (getTaskStatusesArray() as any)[prop];
+  },
+  has(target, prop) {
+    return prop in getTaskStatusesArray();
+  }
+});
+
+export const EPIC_STATUSES = new Proxy([] as any[], {
+  get(target, prop) {
+    if (prop === 'length') return getEpicStatusesArray().length;
+    if (typeof prop === 'string' && !isNaN(Number(prop))) {
+      return getEpicStatusesArray()[Number(prop)];
+    }
+    return (getEpicStatusesArray() as any)[prop];
+  },
+  has(target, prop) {
+    return prop in getEpicStatusesArray();
+  }
+});
+
+export type TaskStatus = string;
+export type EpicStatus = string;
 
 // Priority type (0-5, where 0 is highest priority)
 export type Priority = 0 | 1 | 2 | 3 | 4 | 5;

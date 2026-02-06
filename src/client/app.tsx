@@ -1,6 +1,8 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import { useAppData } from "@/hooks/use-data";
 import { useUIStore } from "@/stores";
+import { useConfigStore } from "@/stores/config-store";
 import { AppHeader } from "@/components/app-header";
 import { ConnectionIndicator } from "@/components/shared/connection-indicator";
 import { CreateModal } from "@/components/create-modal";
@@ -15,6 +17,12 @@ export function App() {
     openCreateModal,
     closeCreateModal,
   } = useUIStore();
+  const fetchConfig = useConfigStore((state) => state.fetchConfig);
+
+  // Load config on app start
+  useEffect(() => {
+    fetchConfig();
+  }, [fetchConfig]);
 
   return (
     <div className="min-h-screen flex flex-col">
