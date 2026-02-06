@@ -18,6 +18,7 @@ import archiveRoutes from "./routes/archive";
 import configRoutes from "./routes/config";
 import bulkDeleteRoutes from "./routes/bulk-delete";
 import { errorHandler } from "./middleware/error-handler";
+import { projectContextMiddleware } from "./middleware/project-context.js";
 import { loadConfig, getDefaultProject } from "./config/loader.js";
 import { dbManager } from "./lib/database-manager.js";
 
@@ -47,6 +48,19 @@ app.use(
     origin: ["http://localhost:5173", "http://localhost:3000"],
   })
 );
+
+// Project context middleware for all API routes (except /api/projects and /api/config)
+app.use("/api/tasks/*", projectContextMiddleware);
+app.use("/api/epics/*", projectContextMiddleware);
+app.use("/api/comments/*", projectContextMiddleware);
+app.use("/api/dependencies/*", projectContextMiddleware);
+app.use("/api/project", projectContextMiddleware);
+app.use("/api/events", projectContextMiddleware);
+app.use("/api/search", projectContextMiddleware);
+app.use("/api/list", projectContextMiddleware);
+app.use("/api/history", projectContextMiddleware);
+app.use("/api/bulk-archive-completed", projectContextMiddleware);
+app.use("/api/bulk-delete", projectContextMiddleware);
 
 // Mount API routes
 app.route("/api/tasks", tasksRoutes);
