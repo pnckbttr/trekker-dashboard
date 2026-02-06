@@ -103,7 +103,30 @@ export function useUpdateTask() {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onMutate: async ({ id, data }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["tasks"] });
+      
+      // Snapshot previous value
+      const previousTasks = queryClient.getQueryData<Task[]>(["tasks"]);
+      
+      // Optimistically update
+      queryClient.setQueryData<Task[]>(["tasks"], (old) => {
+        if (!old) return old;
+        return old.map((task) =>
+          task.id === id ? { ...task, ...data } : task
+        );
+      });
+      
+      return { previousTasks };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousTasks) {
+        queryClient.setQueryData(["tasks"], context.previousTasks);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
@@ -149,6 +172,28 @@ export function useBulkArchiveCompleted() {
   });
 }
 
+export function useBulkDelete() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (queryParams: string) => {
+      const res = await fetch(`/api/bulk-delete?${queryParams}`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || "Failed to delete items");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["epics"] });
+      queryClient.invalidateQueries({ queryKey: ["list"] });
+    },
+  });
+}
+
 export function useCreateEpic() {
   const queryClient = useQueryClient();
 
@@ -187,7 +232,30 @@ export function useUpdateEpic() {
       }
       return res.json();
     },
-    onSuccess: () => {
+    onMutate: async ({ id, data }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["epics"] });
+      
+      // Snapshot previous value
+      const previousEpics = queryClient.getQueryData<Epic[]>(["epics"]);
+      
+      // Optimistically update
+      queryClient.setQueryData<Epic[]>(["epics"], (old) => {
+        if (!old) return old;
+        return old.map((epic) =>
+          epic.id === id ? { ...epic, ...data } : epic
+        );
+      });
+      
+      return { previousEpics };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousEpics) {
+        queryClient.setQueryData(["epics"], context.previousEpics);
+      }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["epics"] });
     },
   });

@@ -3,7 +3,7 @@
 import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeader, StatusSelect, PrioritySelect } from "@/components/shared";
-import { TASK_STATUSES } from "@/lib/constants";
+import { useConfigStore } from "@/stores/config-store";
 import type { Task, Epic } from "@/types";
 
 interface DetailsSectionProps {
@@ -23,6 +23,8 @@ export function DetailsSection({
 }: DetailsSectionProps) {
   const epic = task.epicId ? getEpicById(task.epicId) : null;
   const tags = task.tags ? task.tags.split(",").map((t) => t.trim()) : [];
+  const getTaskStatuses = useConfigStore((state) => state.getTaskStatuses);
+  const taskStatuses = getTaskStatuses().map(s => s.key);
 
   const handleEpicClick = () => {
     if (epic && onEpicClick) {
@@ -41,7 +43,7 @@ export function DetailsSection({
           <StatusSelect
             value={task.status}
             onChange={onStatusChange}
-            statuses={TASK_STATUSES}
+            statuses={taskStatuses}
             triggerClassName="w-auto h-8 text-right"
           />
         </div>

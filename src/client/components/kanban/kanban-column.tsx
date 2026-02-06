@@ -1,5 +1,6 @@
 "use client";
 
+import { useDroppable } from "@dnd-kit/core";
 import { Plus, Archive } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ interface KanbanColumnProps {
   onTaskClick: (task: Task) => void;
   onEpicClick: (epic: Epic) => void;
   onArchiveAll?: () => void;
+  statusKey: string;
 }
 
 export function KanbanColumn({
@@ -29,7 +31,12 @@ export function KanbanColumn({
   onTaskClick,
   onEpicClick,
   onArchiveAll,
+  statusKey,
 }: KanbanColumnProps) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: statusKey,
+  });
+
   const totalCount = tasks.length + epics.length;
 
   const getEpicName = (epicId: string | null) => {
@@ -50,7 +57,12 @@ export function KanbanColumn({
   };
 
   return (
-    <div className="w-[280px] min-w-[280px] max-w-[320px] flex flex-col overflow-hidden border rounded-md">
+    <div 
+      ref={setNodeRef}
+      className={`w-[280px] min-w-[280px] max-w-[320px] flex flex-col overflow-hidden border rounded-md transition-colors ${
+        isOver ? "ring-2 ring-primary bg-accent/30" : ""
+      }`}
+    >
       {/* Column Header */}
       <div className="flex items-center justify-between border-b p-2 bg-accent/50">
         <div className="flex items-center gap-2">

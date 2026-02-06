@@ -14,7 +14,15 @@ import searchRoutes from "./routes/search";
 import listRoutes from "./routes/list";
 import historyRoutes from "./routes/history";
 import archiveRoutes from "./routes/archive";
+import configRoutes from "./routes/config";
+import bulkDeleteRoutes from "./routes/bulk-delete";
 import { errorHandler } from "./middleware/error-handler";
+import { loadConfig } from "./config/loader.js";
+
+// Pre-load config at startup for instant API responses
+console.log("Loading configuration...");
+loadConfig();
+console.log("Configuration loaded successfully");
 
 const app = new Hono();
 
@@ -37,6 +45,8 @@ app.route("/api/search", searchRoutes);
 app.route("/api/list", listRoutes);
 app.route("/api/history", historyRoutes);
 app.route("/api/bulk-archive-completed", archiveRoutes);
+app.route("/api/bulk-delete", bulkDeleteRoutes);
+app.route("/api/config", configRoutes);
 
 // Centralized error handling
 app.onError(errorHandler);
@@ -51,7 +61,14 @@ if (existsSync(distClientPath)) {
   const serveIndex = async () => {
     if (existsSync(indexPath)) {
       const file = Bun.file(indexPath);
-      return new Response(file, {
+      let html = await file.text();
+      
+      // Inject config into HTML as a global variable
+      const config = loadConfig();
+      const configScript = `<script>window.__TREKKER_CONFIG__ = ${JSON.stringify(config)};</script>`;
+      html = html.replace('</head>', `${configScript}</head>`);
+      
+      return new Response(html, {
         headers: { "Content-Type": "text/html" },
       });
     }
