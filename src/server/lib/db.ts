@@ -58,6 +58,15 @@ export function getDb() {
 }
 
 export function getSqliteInstance() {
+  // In multi-project mode, get instance from DatabaseManager
+  const { dbManager } = require("./database-manager.js");
+  const sqliteFromManager = dbManager.getSqliteInstance();
+  
+  if (sqliteFromManager) {
+    return sqliteFromManager;
+  }
+
+  // Fall back to legacy mode
   if (!sqliteInstance) {
     getDb(); // Initialize if not already
   }

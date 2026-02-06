@@ -146,6 +146,17 @@ class DatabaseManager {
   }
 
   /**
+   * Get raw SQLite instance for current connection
+   */
+  getSqliteInstance(): Database | null {
+    if (!this.currentProjectId) {
+      return null;
+    }
+    const connection = this.connections.get(this.currentProjectId);
+    return connection?.sqliteDb || null;
+  }
+
+  /**
    * Check if a project has an active connection
    */
   isConnected(projectId: string): boolean {
