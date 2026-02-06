@@ -8,7 +8,7 @@ import { AppHeader } from "@/components/app-header";
 import { ConnectionIndicator } from "@/components/shared/connection-indicator";
 import { CreateModal } from "@/components/create-modal";
 import { ProjectSidebar } from "@/components/sidebar/project-sidebar";
-import { KanbanPage, ListPage, HistoryPage } from "@/pages";
+import { KanbanPage, ListPage, HistoryPage, SettingsPage } from "@/pages";
 
 export function App() {
   const { tasks, epics, project, refetch } = useAppData();
@@ -45,6 +45,7 @@ export function App() {
             <Route path="/" element={<KanbanPage />} />
             <Route path="/list" element={<ListPage />} />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Routes>
 
           <footer className="px-4 py-2 border-t">

@@ -108,6 +108,7 @@ if (existsSync(distClientPath)) {
   app.get("/", async () => serveIndex());
   app.get("/list", async () => serveIndex());
   app.get("/history", async () => serveIndex());
+  app.get("/settings", async () => serveIndex());
 
   // Serve static files (JS, CSS, images, etc.)
   app.use(
