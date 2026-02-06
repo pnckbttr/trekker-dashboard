@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useProjectStore } from "@/stores/project-store";
 
 export type ListEntityType = "epic" | "task" | "subtask";
 
@@ -33,9 +34,12 @@ export interface ListFilters {
   until?: string;
 }
 
-async function fetchList(filters: ListFilters): Promise<ListResponse> {
+async function fetchList(filters: ListFilters, projectId?: string | null): Promise<ListResponse> {
   const params = new URLSearchParams();
 
+  if (projectId) {
+    params.set("projectId", projectId);
+  }
   if (filters.types?.length) {
     params.set("type", filters.types.join(","));
   }
@@ -70,8 +74,11 @@ async function fetchList(filters: ListFilters): Promise<ListResponse> {
 }
 
 export function useList(filters: ListFilters) {
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
+  
   return useQuery({
-    queryKey: ["list", filters],
-    queryFn: () => fetchList(filters),
+    queryKey: ["list", activeProjectId, filters],
+    queryFn: () => fetchList(filters, activeProjectId),
+    enabled: !!activeProjectId,
   });
 }

@@ -1,9 +1,8 @@
 import { create } from "zustand";
 
 export interface StatusConfig {
-  key: string;
+  value: string;
   label: string;
-  color: string;
   description?: string;
 }
 
@@ -75,7 +74,7 @@ export const useConfigStore = create<ConfigStore>((set, get) => ({
   getVisibleTaskStatuses: () => {
     const { config } = get();
     return (
-      config?.statuses.task.filter((s) => s.key !== "archived") || []
+      config?.statuses.task.filter((s) => s.value !== "archived") || []
     );
   },
 }));

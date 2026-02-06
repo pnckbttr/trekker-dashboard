@@ -128,17 +128,17 @@ export function KanbanBoard({
       <div className="flex gap-4 items-start flex-nowrap min-h-[calc(100vh-180px)] justify-center">
         {statusColumns.map((column) => (
           <KanbanColumn
-            key={column.key}
+            key={column.value}
             label={column.label}
-            tasks={getTasksByStatus(column.key)}
-            epics={getEpicsByStatus(column.key)}
+            tasks={getTasksByStatus(column.value)}
+            epics={getEpicsByStatus(column.value)}
             allTasks={tasks}
             allEpics={epics}
-            onAddClick={() => onAddClick(column.key)}
+            onAddClick={() => onAddClick(column.value)}
             onTaskClick={onTaskClick}
             onEpicClick={onEpicClick}
-            onArchiveAll={column.key === "completed" ? onArchiveAllCompleted : undefined}
-            statusKey={column.key}
+            onArchiveAll={column.value === "completed" ? onArchiveAllCompleted : undefined}
+            statusKey={column.value}
           />
         ))}
       </div>

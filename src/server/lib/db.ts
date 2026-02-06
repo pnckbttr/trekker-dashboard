@@ -26,7 +26,25 @@ export type IdCounter = typeof idCounters.$inferSelect;
 let sqliteInstance: Database | null = null;
 let db: ReturnType<typeof drizzle<typeof schema>> | null = null;
 
+/**
+ * Get database connection
+ * 
+ * In multi-project mode (when projects are configured), this returns
+ * the currently active connection from DatabaseManager.
+ * 
+ * In single-project mode (legacy), falls back to TREKKER_DB_PATH.
+ */
 export function getDb() {
+  // Check if we're in multi-project mode
+  // This will be set by middleware or can be manually called
+  const { dbManager } = require("./database-manager.js");
+  const currentDb = dbManager.getCurrentConnection();
+  
+  if (currentDb) {
+    return currentDb;
+  }
+
+  // Fall back to legacy single-project mode
   if (db) return db;
 
   const dbPath = process.env.TREKKER_DB_PATH;
@@ -40,6 +58,15 @@ export function getDb() {
 }
 
 export function getSqliteInstance() {
+  // In multi-project mode, get instance from DatabaseManager
+  const { dbManager } = require("./database-manager.js");
+  const sqliteFromManager = dbManager.getSqliteInstance();
+  
+  if (sqliteFromManager) {
+    return sqliteFromManager;
+  }
+
+  // Fall back to legacy mode
   if (!sqliteInstance) {
     getDb(); // Initialize if not already
   }

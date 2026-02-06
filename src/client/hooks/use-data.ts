@@ -2,45 +2,58 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Task, Epic, Project, CreateTaskInput, UpdateTaskInput } from "@/types";
+import { useProjectStore } from "@/stores/project-store";
 
 // Fetch functions
-async function fetchTasks(): Promise<Task[]> {
-  const res = await fetch("/api/tasks");
+async function fetchTasks(projectId?: string | null): Promise<Task[]> {
+  const url = projectId ? `/api/tasks?projectId=${projectId}` : "/api/tasks";
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch tasks");
   return res.json();
 }
 
-async function fetchEpics(): Promise<Epic[]> {
-  const res = await fetch("/api/epics");
+async function fetchEpics(projectId?: string | null): Promise<Epic[]> {
+  const url = projectId ? `/api/epics?projectId=${projectId}` : "/api/epics";
+  const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch epics");
   return res.json();
 }
 
-async function fetchProject(): Promise<Project | null> {
-  const res = await fetch("/api/project");
+async function fetchProject(projectId?: string | null): Promise<Project | null> {
+  const url = projectId ? `/api/project?projectId=${projectId}` : "/api/project";
+  const res = await fetch(url);
   if (!res.ok) return null;
   return res.json();
 }
 
 // Query hooks
 export function useTasks() {
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
+  
   return useQuery({
-    queryKey: ["tasks"],
-    queryFn: fetchTasks,
+    queryKey: ["tasks", activeProjectId],
+    queryFn: () => fetchTasks(activeProjectId),
+    enabled: !!activeProjectId,
   });
 }
 
 export function useEpics() {
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
+  
   return useQuery({
-    queryKey: ["epics"],
-    queryFn: fetchEpics,
+    queryKey: ["epics", activeProjectId],
+    queryFn: () => fetchEpics(activeProjectId),
+    enabled: !!activeProjectId,
   });
 }
 
 export function useProject() {
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
+  
   return useQuery({
-    queryKey: ["project"],
-    queryFn: fetchProject,
+    queryKey: ["project", activeProjectId],
+    queryFn: () => fetchProject(activeProjectId),
+    enabled: !!activeProjectId,
   });
 }
 
@@ -67,10 +80,12 @@ export function useAppData() {
 // Mutation hooks
 export function useCreateTask() {
   const queryClient = useQueryClient();
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
 
   return useMutation({
     mutationFn: async (data: CreateTaskInput) => {
-      const res = await fetch("/api/tasks", {
+      const url = activeProjectId ? `/api/tasks?projectId=${activeProjectId}` : "/api/tasks";
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -82,17 +97,19 @@ export function useCreateTask() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", activeProjectId] });
     },
   });
 }
 
 export function useUpdateTask() {
   const queryClient = useQueryClient();
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateTaskInput }) => {
-      const res = await fetch(`/api/tasks/${id}`, {
+      const url = activeProjectId ? `/api/tasks/${id}?projectId=${activeProjectId}` : `/api/tasks/${id}`;
+      const res = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -105,13 +122,13 @@ export function useUpdateTask() {
     },
     onMutate: async ({ id, data }) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ["tasks"] });
+      await queryClient.cancelQueries({ queryKey: ["tasks", activeProjectId] });
       
       // Snapshot previous value
-      const previousTasks = queryClient.getQueryData<Task[]>(["tasks"]);
+      const previousTasks = queryClient.getQueryData<Task[]>(["tasks", activeProjectId]);
       
       // Optimistically update
-      queryClient.setQueryData<Task[]>(["tasks"], (old) => {
+      queryClient.setQueryData<Task[]>(["tasks", activeProjectId], (old) => {
         if (!old) return old;
         return old.map((task) =>
           task.id === id ? { ...task, ...data } : task
@@ -123,21 +140,23 @@ export function useUpdateTask() {
     onError: (err, variables, context) => {
       // Rollback on error
       if (context?.previousTasks) {
-        queryClient.setQueryData(["tasks"], context.previousTasks);
+        queryClient.setQueryData(["tasks", activeProjectId], context.previousTasks);
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", activeProjectId] });
     },
   });
 }
 
 export function useDeleteTask() {
   const queryClient = useQueryClient();
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/tasks/${id}`, {
+      const url = activeProjectId ? `/api/tasks/${id}?projectId=${activeProjectId}` : `/api/tasks/${id}`;
+      const res = await fetch(url, {
         method: "DELETE",
       });
       if (!res.ok) {
@@ -146,7 +165,7 @@ export function useDeleteTask() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", activeProjectId] });
     },
   });
 }
@@ -166,8 +185,8 @@ export function useBulkArchiveCompleted() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["epics"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", activeProjectId] });
+      queryClient.invalidateQueries({ queryKey: ["epics", activeProjectId] });
     },
   });
 }
@@ -187,8 +206,8 @@ export function useBulkDelete() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["epics"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", activeProjectId] });
+      queryClient.invalidateQueries({ queryKey: ["epics", activeProjectId] });
       queryClient.invalidateQueries({ queryKey: ["list"] });
     },
   });
@@ -211,7 +230,7 @@ export function useCreateEpic() {
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["epics"] });
+      queryClient.invalidateQueries({ queryKey: ["epics", activeProjectId] });
     },
   });
 }
@@ -234,7 +253,7 @@ export function useUpdateEpic() {
     },
     onMutate: async ({ id, data }) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ["epics"] });
+      await queryClient.cancelQueries({ queryKey: ["epics", activeProjectId] });
       
       // Snapshot previous value
       const previousEpics = queryClient.getQueryData<Epic[]>(["epics"]);
@@ -256,7 +275,7 @@ export function useUpdateEpic() {
       }
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["epics"] });
+      queryClient.invalidateQueries({ queryKey: ["epics", activeProjectId] });
     },
   });
 }
@@ -275,7 +294,7 @@ export function useDeleteEpic() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["epics"] });
+      queryClient.invalidateQueries({ queryKey: ["epics", activeProjectId] });
     },
   });
 }
