@@ -34,10 +34,23 @@ export function CreateForm({ form, type, epics, parentTasks }: CreateFormProps) 
     formState: { errors },
   } = form;
 
-  const taskStatuses = useConfigStore((state) => state.getVisibleTaskStatuses());
-  const epicStatuses = useConfigStore((state) => state.getEpicStatuses()).filter((s) => s.value !== "archived");
+  const allTaskStatuses = useConfigStore((state) => state.getTaskStatuses());
+  const allEpicStatuses = useConfigStore((state) => state.getEpicStatuses());
   
-  const statusOptions = type === "epic" ? epicStatuses : taskStatuses;
+  const taskStatuses = useMemo(() => 
+    allTaskStatuses.filter((s) => s.value !== "archived"),
+    [allTaskStatuses]
+  );
+  
+  const epicStatuses = useMemo(() => 
+    allEpicStatuses.filter((s) => s.value !== "archived"),
+    [allEpicStatuses]
+  );
+  
+  const statusOptions = useMemo(() => 
+    type === "epic" ? epicStatuses : taskStatuses,
+    [type, epicStatuses, taskStatuses]
+  );
 
   return (
     <div className="flex flex-col gap-4">
