@@ -11,7 +11,7 @@ import {
   KeyboardSensor,
   useSensor,
   useSensors,
-  closestCenter,
+  rectIntersection,
 } from "@dnd-kit/core";
 import type { Task, Epic } from "@/types";
 import { KanbanColumn } from "./kanban-column";
@@ -74,13 +74,16 @@ export function KanbanBoard({
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
+    const { active, over, collisions } = event;
     setActiveId(null);
 
-    console.log("[DragEnd]", { 
-      activeId: active.id, 
+    console.log("[DragEnd] Full event:", {
+      activeId: active.id,
       overId: over?.id,
-      allDroppableIds: statusColumns.map(c => c.value)
+      allDroppableIds: statusColumns.map(c => c.value),
+      collisions: collisions?.map(c => ({ id: c.id, data: c.data })),
+      activeRect: active.rect,
+      overRect: over?.rect
     });
 
     if (!over) {
@@ -141,7 +144,7 @@ export function KanbanBoard({
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={rectIntersection}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
