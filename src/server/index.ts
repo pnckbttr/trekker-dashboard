@@ -24,8 +24,15 @@ import { dbManager } from "./lib/database-manager.js";
 
 // Pre-load config at startup for instant API responses
 console.log("Loading configuration...");
-const config = loadConfig();
-console.log("Configuration loaded successfully");
+try {
+  const config = loadConfig();
+  console.log("Configuration loaded successfully");
+} catch (error) {
+  console.error("\n❌ ERROR: Failed to load configuration");
+  console.error((error as Error).message);
+  console.error("\nServer cannot start without a valid config file.");
+  process.exit(1);
+}
 
 // Initialize default project connection if available
 const defaultProject = getDefaultProject();

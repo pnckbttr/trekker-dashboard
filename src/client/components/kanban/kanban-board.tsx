@@ -11,7 +11,7 @@ import {
   KeyboardSensor,
   useSensor,
   useSensors,
-  closestCorners,
+  rectIntersection,
 } from "@dnd-kit/core";
 import type { Task, Epic } from "@/types";
 import { KanbanColumn } from "./kanban-column";
@@ -77,7 +77,9 @@ export function KanbanBoard({
     const { active, over } = event;
     setActiveId(null);
 
-    if (!over) return;
+    if (!over) {
+      return;
+    }
 
     const taskId = active.id as string;
     const newStatus = over.id as string;
@@ -86,21 +88,25 @@ export function KanbanBoard({
     const task = tasks.find((t) => t.id === taskId);
     const epic = epics.find((e) => e.id === taskId);
 
-    if (!task && !epic) return;
+    if (!task && !epic) {
+      return;
+    }
 
     // Check if status actually changed
     const currentStatus = task?.status || epic?.status;
-    if (currentStatus === newStatus) return;
+    if (currentStatus === newStatus) {
+      return;
+    }
 
     // Update via mutation hooks (optimistic)
     try {
       if (task) {
-        await updateTask.mutateAsync({ id: taskId, data: { status: newStatus } });
+        await updateTask.mutateAsync({ id: task.id, data: { status: newStatus } });
       } else if (epic) {
-        await updateEpic.mutateAsync({ id: taskId, data: { status: newStatus } });
+        await updateEpic.mutateAsync({ id: epic.id, data: { status: newStatus } });
       }
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("Failed to update status:", error);
       // TODO: Show error notification
     }
   };
@@ -120,7 +126,7 @@ export function KanbanBoard({
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCorners}
+      collisionDetection={rectIntersection}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}

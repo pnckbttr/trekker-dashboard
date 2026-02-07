@@ -193,6 +193,7 @@ export function useBulkArchiveCompleted() {
 
 export function useBulkDelete() {
   const queryClient = useQueryClient();
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
 
   return useMutation({
     mutationFn: async (queryParams: string) => {
@@ -237,6 +238,7 @@ export function useCreateEpic() {
 
 export function useUpdateEpic() {
   const queryClient = useQueryClient();
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
 
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Partial<Epic> }) => {

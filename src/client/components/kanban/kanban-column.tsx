@@ -59,7 +59,7 @@ export function KanbanColumn({
   return (
     <div 
       ref={setNodeRef}
-      className={`w-[280px] min-w-[280px] max-w-[320px] flex flex-col overflow-hidden border rounded-md transition-colors ${
+      className={`w-[280px] min-w-[280px] max-w-[320px] flex flex-col border rounded-md transition-colors ${
         isOver ? "ring-2 ring-primary bg-accent/30" : ""
       }`}
     >
@@ -96,8 +96,8 @@ export function KanbanColumn({
       </div>
 
       {/* Column Content */}
-      <div className="flex-1 min-h-[100px]">
-        <div className="flex flex-col gap-2 p-2">
+      <div className="flex-1 min-h-[100px] overflow-auto">
+        <div className="flex flex-col gap-2 p-2 min-h-full">
           {epics.map((epic) => (
             <EpicCard
               key={epic.id}

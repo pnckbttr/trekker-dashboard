@@ -19,7 +19,7 @@ const updateEpicSchema = z.object({
   description: z.string().nullable().optional(),
   status: z.enum(EPIC_STATUSES).optional(),
   priority: z.number().int().min(0).max(5).optional(),
-});
+}).passthrough();
 
 // Routes
 app.get("/", async (c) => {
@@ -38,8 +38,18 @@ app.get("/:id", async (c) => {
   return c.json(epic);
 });
 
-app.put("/:id", zValidator("json", updateEpicSchema), async (c) => {
-  const epic = await epicService.update(c.req.param("id"), c.req.valid("json"));
+app.put("/:id", async (c) => {
+  // Validate at runtime when EPIC_STATUSES is properly loaded
+  const updateSchema = z.object({
+    title: z.string().min(1).optional(),
+    description: z.string().nullable().optional(),
+    status: z.enum(EPIC_STATUSES as any).optional(),
+    priority: z.number().int().min(0).max(5).optional(),
+  }).passthrough();
+  
+  const data = await c.req.json();
+  const validated = updateSchema.parse(data);
+  const epic = await epicService.update(c.req.param("id"), validated);
   return c.json(epic);
 });
 

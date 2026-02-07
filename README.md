@@ -34,6 +34,7 @@ trekker-dashboard --help     # Show help
 
 - **Bun runtime** (required) - The dashboard uses Bun's native SQLite driver
 - A project initialized with Trekker (`trekker init`)
+- **Config file** (required) - Must be set up before first run
 
 ### Installing Bun
 
@@ -52,6 +53,17 @@ npm install -g bun
 ```
 
 See [bun.sh/docs/installation](https://bun.sh/docs/installation) for more options.
+
+### Configuration Setup
+
+Before first use, copy the example config file to your home directory:
+
+```bash
+mkdir -p ~/.copilot
+cp trekker-config.example.json ~/.copilot/trekker-config.json
+```
+
+The config file defines task/epic statuses, priorities, and project settings. You can customize statuses, labels, and colors to match your workflow.
 
 ## Features
 
