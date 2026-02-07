@@ -25,10 +25,12 @@ export function TaskCard({ task, epicName, subtasks, onClick }: TaskCardProps) {
     id: task.id,
   });
 
-  const style = {
-    transform: CSS.Translate.toString(transform),
-    opacity: isDragging ? 0.5 : 1,
-  };
+  const style = isDragging 
+    ? { opacity: 0 }
+    : {
+        transform: CSS.Translate.toString(transform),
+        opacity: 1,
+      };
 
   const completedSubtasks = subtasks.filter(
     (s) => s.status === "completed",

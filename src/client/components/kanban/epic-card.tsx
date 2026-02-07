@@ -18,10 +18,12 @@ export function EpicCard({ epic, taskCount, onClick }: EpicCardProps) {
     id: epic.id,
   });
 
-  const style = {
-    transform: CSS.Translate.toString(transform),
-    opacity: isDragging ? 0.5 : 1,
-  };
+  const style = isDragging 
+    ? { opacity: 0 }
+    : {
+        transform: CSS.Translate.toString(transform),
+        opacity: 1,
+      };
 
   const handleClick = (e: React.MouseEvent) => {
     if (!isDragging) {
