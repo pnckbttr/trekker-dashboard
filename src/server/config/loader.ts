@@ -38,42 +38,11 @@ export interface TrekkerConfig {
   };
 }
 
-const DEFAULT_CONFIG: TrekkerConfig = {
-  version: "1.0.0",
-  statuses: {
-    task: [
-      { value: "todo", label: "📝 To Do", description: "Tasks that are planned but not started" },
-      { value: "in_progress", label: "🚧 In Progress", description: "Tasks that are currently being worked on" },
-      { value: "feedback", label: "💬 Feedback", description: "Tasks waiting for feedback or review" },
-      { value: "completed", label: "✅ Completed", description: "Tasks that are finished" },
-      { value: "wont_fix", label: "❌ Won't Fix", description: "Tasks that won't be implemented" },
-      { value: "archived", label: "📦 Archived", description: "Old tasks that are archived" },
-    ],
-    epic: [
-      { value: "todo", label: "📝 To Do", description: "Epics that are planned" },
-      { value: "in_progress", label: "🚧 In Progress", description: "Epics currently being worked on" },
-      { value: "feedback", label: "💬 Feedback", description: "Epics waiting for feedback or review" },
-      { value: "completed", label: "✅ Completed", description: "Epics that are finished" },
-      { value: "archived", label: "📦 Archived", description: "Old epics that are archived" },
-    ],
-  },
-  priorities: [
-    { value: 0, label: "🔥 Critical", color: "#ef4444" },
-    { value: 1, label: "⚠️ High", color: "#f97316" },
-    { value: 2, label: "📌 Medium", color: "#eab308" },
-    { value: 3, label: "📎 Low", color: "#22c55e" },
-    { value: 4, label: "💤 Very Low", color: "#6b7280" },
-    { value: 5, label: "🌙 Someday", color: "#9ca3af" },
-  ],
-};
-
 let cachedConfig: TrekkerConfig | null = null;
 
 /**
- * Load Trekker configuration with the following priority:
- * 1. Global config: ~/.copilot/trekker-config.json
- * 2. Project-local config: .trekker/config.json
- * 3. Default hardcoded config
+ * Load Trekker configuration from ~/.copilot/trekker-config.json
+ * Config file is REQUIRED - server will not start without it.
  */
 export function loadConfig(force = false): TrekkerConfig {
   // Return cached config unless force reload
@@ -81,57 +50,27 @@ export function loadConfig(force = false): TrekkerConfig {
     return cachedConfig;
   }
 
-  // Try global config first
+  // Only load from global config file
   const globalConfigPath = join(homedir(), ".copilot", "trekker-config.json");
-  if (existsSync(globalConfigPath)) {
-    try {
-      const fileContent = readFileSync(globalConfigPath, "utf-8");
-      const config = JSON.parse(fileContent) as TrekkerConfig;
-      
-      // Merge with defaults to ensure all fields exist
-      cachedConfig = {
-        ...DEFAULT_CONFIG,
-        ...config,
-        statuses: {
-          task: config.statuses?.task || DEFAULT_CONFIG.statuses.task,
-          epic: config.statuses?.epic || DEFAULT_CONFIG.statuses.epic,
-        },
-      };
-
-      console.log("[Config] Loaded global config from ~/.copilot/trekker-config.json");
-      return cachedConfig;
-    } catch (error) {
-      console.warn(`[Config] Failed to parse global config, trying local: ${error}`);
-    }
+  
+  if (!existsSync(globalConfigPath)) {
+    throw new Error(
+      `Config file not found at ${globalConfigPath}\n` +
+      `Please copy trekker-config.example.json to ~/.copilot/trekker-config.json`
+    );
   }
 
-  // Fall back to project-local config
-  const localConfigPath = join(process.cwd(), ".trekker", "config.json");
-  if (existsSync(localConfigPath)) {
-    try {
-      const fileContent = readFileSync(localConfigPath, "utf-8");
-      const config = JSON.parse(fileContent) as Partial<TrekkerConfig>;
-
-      cachedConfig = {
-        ...DEFAULT_CONFIG,
-        ...config,
-        statuses: {
-          task: config.statuses?.task || DEFAULT_CONFIG.statuses.task,
-          epic: config.statuses?.epic || DEFAULT_CONFIG.statuses.epic,
-        },
-      };
-
-      console.log("[Config] Loaded local config from .trekker/config.json");
-      return cachedConfig;
-    } catch (error) {
-      console.warn(`[Config] Failed to parse local config, using defaults: ${error}`);
-    }
+  try {
+    const fileContent = readFileSync(globalConfigPath, "utf-8");
+    cachedConfig = JSON.parse(fileContent) as TrekkerConfig;
+    console.log("[Config] Loaded global config from ~/.copilot/trekker-config.json");
+    return cachedConfig;
+  } catch (error) {
+    throw new Error(
+      `Failed to parse config file at ${globalConfigPath}: ${error}\n` +
+      `Please ensure the config file is valid JSON`
+    );
   }
-
-  // No config file, use defaults
-  console.log("[Config] No config file found, using defaults");
-  cachedConfig = DEFAULT_CONFIG;
-  return cachedConfig;
 }
 
 export function getTaskStatuses(): string[] {
