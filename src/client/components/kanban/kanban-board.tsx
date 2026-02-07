@@ -95,9 +95,9 @@ export function KanbanBoard({
     // Update via mutation hooks (optimistic)
     try {
       if (task) {
-        await updateTask.mutateAsync({ id: taskId, data: { status: newStatus } });
+        await updateTask.mutateAsync({ id: task.id, data: { status: newStatus } });
       } else if (epic) {
-        await updateEpic.mutateAsync({ id: taskId, data: { status: newStatus } });
+        await updateEpic.mutateAsync({ id: epic.id, data: { status: newStatus } });
       }
     } catch (error) {
       console.error("Error updating status:", error);

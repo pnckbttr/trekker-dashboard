@@ -193,6 +193,7 @@ export function useBulkArchiveCompleted() {
 
 export function useBulkDelete() {
   const queryClient = useQueryClient();
+  const activeProjectId = useProjectStore((state) => state.activeProjectId);
 
   return useMutation({
     mutationFn: async (queryParams: string) => {
