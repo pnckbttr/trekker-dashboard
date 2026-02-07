@@ -8,7 +8,6 @@ import { NotificationToggle } from "@/components/notification-toggle";
 import { cn } from "@/lib/utils";
 
 interface AppHeaderProps {
-  projectName?: string;
   onNewClick?: () => void;
 }
 
@@ -18,7 +17,7 @@ const navItems = [
   { to: "/history", label: "History", icon: History },
 ];
 
-export function AppHeader({ projectName, onNewClick }: AppHeaderProps) {
+export function AppHeader({ onNewClick }: AppHeaderProps) {
   return (
     <header className="flex items-center justify-between border-b px-4 py-2 bg-accent/50">
       <div className="flex items-center gap-6">
@@ -50,12 +49,6 @@ export function AppHeader({ projectName, onNewClick }: AppHeaderProps) {
       </div>
 
       <div className="flex gap-6">
-        {projectName && (
-          <div className="flex items-center gap-1">
-            <Package className="text-muted-foreground" width={16} />
-            <span className="text-sm text-muted-foreground">{projectName}</span>
-          </div>
-        )}
         <div className="flex items-center gap-2">
           {onNewClick && (
             <Button size="sm" onClick={onNewClick}>

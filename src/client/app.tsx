@@ -43,7 +43,6 @@ export function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <AppHeader
-        projectName={project?.name}
         onNewClick={() => openCreateModal({ status: "todo" })}
       />
 
@@ -60,7 +59,7 @@ export function App() {
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
 
-          <footer className="px-4 py-2 border-t">
+          <footer className="sticky bottom-0 px-4 py-2 border-t bg-background z-10">
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
                 {tasks.length} tasks across {epics.length} epics
