@@ -18,6 +18,15 @@ app.get("/", async (c) => {
       while (running) {
         try {
           const events = await eventService.getChanges();
+          
+          // Send ping to keep connection alive (even if no events)
+          if (events.length === 0) {
+            await stream.writeSSE({
+              event: 'ping',
+              data: String(Date.now()),
+            });
+          }
+          
           for (const event of events) {
             await stream.writeSSE({
               data: JSON.stringify({
