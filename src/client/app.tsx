@@ -41,9 +41,8 @@ export function App() {
   }, [queryClient]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <AppHeader
-        projectName={project?.name}
         onNewClick={() => openCreateModal({ status: "todo" })}
       />
 
@@ -52,24 +51,25 @@ export function App() {
         <ProjectSidebar />
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-auto pb-12">
           <Routes>
             <Route path="/" element={<KanbanPage />} />
             <Route path="/list" element={<ListPage />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
-
-          <footer className="px-4 py-2 border-t">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">
-                {tasks.length} tasks across {epics.length} epics
-              </span>
-              <ConnectionIndicator status={connectionStatus} />
-            </div>
-          </footer>
         </div>
       </div>
+
+      {/* Fixed Footer */}
+      <footer className="fixed bottom-0 right-0 left-60 px-4 py-2 border-t bg-background z-20">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
+            {tasks.length} tasks across {epics.length} epics
+          </span>
+          <ConnectionIndicator status={connectionStatus} />
+        </div>
+      </footer>
 
       <CreateModal
         open={showCreateModal}

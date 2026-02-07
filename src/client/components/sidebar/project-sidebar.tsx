@@ -1,18 +1,27 @@
 import { useProjectStore } from "../../stores/project-store";
-import { ChevronLeft, Settings } from "lucide-react";
+import { ChevronLeft, Settings, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "../../lib/utils";
 
 export function ProjectSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { projects, activeProjectId, switchProject } = useProjectStore();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleProjectClick = async (projectId: string) => {
+    await switchProject(projectId);
+    // If on settings page, navigate to kanban board
+    if (location.pathname === '/settings') {
+      navigate('/');
+    }
+  };
 
   return (
     <div
       className={cn(
-        "flex flex-col bg-secondary border-r border-border transition-all duration-300 flex-shrink-0",
+        "flex flex-col bg-secondary border-r border-border transition-all duration-300 flex-shrink-0 h-full",
         collapsed ? "w-16" : "w-60"
       )}
     >
@@ -40,7 +49,7 @@ export function ProjectSidebar() {
         {projects.map((project) => (
           <button
             key={project.id}
-            onClick={() => switchProject(project.id)}
+            onClick={() => handleProjectClick(project.id)}
             className={cn(
               "w-full flex items-center gap-3 p-3 rounded-lg mb-1 transition-colors text-left",
               activeProjectId === project.id
@@ -66,10 +75,17 @@ export function ProjectSidebar() {
               </div>
             )}
 
-            {!collapsed && project.connected && (
+            {!collapsed && project.connected !== false && (
               <div
                 className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"
                 title="Connected"
+              />
+            )}
+
+            {!collapsed && project.connected === false && (
+              <AlertCircle 
+                className="w-4 h-4 text-destructive flex-shrink-0"
+                title="Database not found"
               />
             )}
           </button>

@@ -27,7 +27,7 @@ export function StatusSelect({
   
   // Create a lookup map for labels
   const statusLabelMap = statusConfigs.reduce((acc, s) => {
-    acc[s.key] = s.label;
+    acc[s.value] = s.label;
     return acc;
   }, {} as Record<string, string>);
 

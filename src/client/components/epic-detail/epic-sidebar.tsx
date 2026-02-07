@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { isTerminalStatus } from "@/lib/status";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ import {
   StatusSelect,
   PrioritySelect,
 } from "@/components/shared";
-import { EPIC_STATUSES } from "@/lib/constants";
+import { useConfigStore } from "@/stores/config-store";
 import type { Task } from "@/types";
 
 interface EpicSidebarProps {
@@ -34,6 +35,11 @@ export function EpicSidebar({
   onPriorityChange,
   onTaskClick,
 }: EpicSidebarProps) {
+  const allEpicStatuses = useConfigStore((state) => state.getEpicStatuses());
+  const epicStatuses = useMemo(() => 
+    allEpicStatuses.filter((s) => s.value !== "archived"),
+    [allEpicStatuses]
+  );
   const epicTasks = tasks.filter((t) => !t.parentTaskId);
   const completedTasks = epicTasks.filter((t) =>
     isTerminalStatus(t.status),
@@ -52,7 +58,7 @@ export function EpicSidebar({
               <StatusSelect
                 value={status}
                 onChange={onStatusChange}
-                statuses={EPIC_STATUSES}
+                statuses={epicStatuses.map((s) => s.value)}
                 triggerClassName="w-auto h-8 text-right"
               />
             </div>

@@ -13,10 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useConfigStore } from "@/stores/config-store";
 import {
-  EPIC_STATUSES,
-  TASK_STATUSES,
-  STATUS_LABELS,
   PRIORITY_LABELS,
 } from "@/lib/constants";
 import type { CreateType, Epic, Task } from "@/types";
@@ -36,7 +34,23 @@ export function CreateForm({ form, type, epics, parentTasks }: CreateFormProps) 
     formState: { errors },
   } = form;
 
-  const statusOptions = type === "epic" ? EPIC_STATUSES : TASK_STATUSES;
+  const allTaskStatuses = useConfigStore((state) => state.getTaskStatuses());
+  const allEpicStatuses = useConfigStore((state) => state.getEpicStatuses());
+  
+  const taskStatuses = useMemo(() => 
+    allTaskStatuses.filter((s) => s.value !== "archived"),
+    [allTaskStatuses]
+  );
+  
+  const epicStatuses = useMemo(() => 
+    allEpicStatuses.filter((s) => s.value !== "archived"),
+    [allEpicStatuses]
+  );
+  
+  const statusOptions = useMemo(() => 
+    type === "epic" ? epicStatuses : taskStatuses,
+    [type, epicStatuses, taskStatuses]
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -75,8 +89,8 @@ export function CreateForm({ form, type, epics, parentTasks }: CreateFormProps) 
                 </SelectTrigger>
                 <SelectContent>
                   {statusOptions.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {STATUS_LABELS[s]}
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

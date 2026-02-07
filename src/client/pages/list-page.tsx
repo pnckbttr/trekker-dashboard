@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Search, X, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, X, Trash2, AlertCircle } from "lucide-react";
 import { useList, ListFilters, ListEntityType, ListItem } from "@/hooks/use-list";
 import { useAppData, useBulkDelete } from "@/hooks/use-data";
 import { useUIStore } from "@/stores";
+import { useProjectStore } from "@/stores/project-store";
 import { TaskDetailModal } from "@/components/task-detail";
 import { EpicDetailModal } from "@/components/epic-detail";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -49,6 +50,7 @@ const PAGE_SIZE_OPTIONS = [20, 50, 100];
 export function ListPage() {
   const { tasks, epics, refetch } = useAppData();
   const bulkDelete = useBulkDelete();
+  const activeProject = useProjectStore((state) => state.activeProject);
   const {
     selectedTaskId,
     selectedEpicId,
@@ -132,6 +134,29 @@ export function ListPage() {
   const hasActiveFilters = !!(filters.types?.length || filters.statuses?.length || filters.priorities?.length);
 
   const totalPages = data ? Math.ceil(data.total / (filters.limit || 20)) : 0;
+
+  // Show warning if project database is unavailable
+  if (activeProject?.connected === false) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 gap-4 p-8">
+        <AlertCircle className="w-12 h-12 text-destructive" />
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-foreground mb-2">
+            Database Not Found
+          </h2>
+          <p className="text-sm text-muted-foreground max-w-md">
+            The database for project "{activeProject.name}" could not be found at:
+          </p>
+          <code className="text-xs bg-muted px-2 py-1 rounded mt-2 inline-block">
+            {activeProject.dbPath}
+          </code>
+          <p className="text-sm text-muted-foreground mt-4">
+            Please check the database path in settings or select a different project.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

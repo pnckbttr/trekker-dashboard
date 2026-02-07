@@ -129,4 +129,5 @@ console.log(`Server starting on http://localhost:${port}`);
 export const server = Bun.serve({
   port,
   fetch: app.fetch,
+  idleTimeout: 255, // Increase timeout for SSE connections
 });
