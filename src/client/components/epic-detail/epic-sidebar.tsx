@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { isTerminalStatus } from "@/lib/status";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,11 @@ export function EpicSidebar({
   onPriorityChange,
   onTaskClick,
 }: EpicSidebarProps) {
-  const epicStatuses = useConfigStore((state) => state.getEpicStatuses()).filter((s) => s.value !== "archived");
+  const allEpicStatuses = useConfigStore((state) => state.getEpicStatuses());
+  const epicStatuses = useMemo(() => 
+    allEpicStatuses.filter((s) => s.value !== "archived"),
+    [allEpicStatuses]
+  );
   const epicTasks = tasks.filter((t) => !t.parentTaskId);
   const completedTasks = epicTasks.filter((t) =>
     isTerminalStatus(t.status),

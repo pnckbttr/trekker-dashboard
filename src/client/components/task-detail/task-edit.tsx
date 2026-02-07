@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -50,7 +51,11 @@ export function TaskEdit({
     handleSubmit,
     formState: { isSubmitting, errors },
   } = form;
-  const taskStatuses = useConfigStore((state) => state.getVisibleTaskStatuses());
+  const allTaskStatuses = useConfigStore((state) => state.getTaskStatuses());
+  const taskStatuses = useMemo(() => 
+    allTaskStatuses.filter((s) => s.value !== "archived"),
+    [allTaskStatuses]
+  );
   const title = watch("title");
   const description = watch("description");
   const status = watch("status");

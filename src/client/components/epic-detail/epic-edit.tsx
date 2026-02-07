@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,7 +41,11 @@ export function EpicEdit({
     handleSubmit,
     formState: { isSubmitting, errors },
   } = form;
-  const epicStatuses = useConfigStore((state) => state.getEpicStatuses()).filter((s) => s.value !== "archived");
+  const allEpicStatuses = useConfigStore((state) => state.getEpicStatuses());
+  const epicStatuses = useMemo(() => 
+    allEpicStatuses.filter((s) => s.value !== "archived"),
+    [allEpicStatuses]
+  );
   const title = watch("title");
   const description = watch("description");
   const status = watch("status");

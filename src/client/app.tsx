@@ -46,31 +46,30 @@ export function App() {
         onNewClick={() => openCreateModal({ status: "todo" })}
       />
 
-      <div className="flex flex-1 overflow-hidden min-h-0">
+      <div className="flex flex-1 overflow-hidden">
         {/* Project Sidebar */}
         <ProjectSidebar />
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 overflow-auto">
-            <Routes>
-              <Route path="/" element={<KanbanPage />} />
-              <Route path="/list" element={<ListPage />} />
-              <Route path="/history" element={<HistoryPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-            </Routes>
-          </div>
-
-          <footer className="px-4 py-2 border-t bg-background z-10 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">
-                {tasks.length} tasks across {epics.length} epics
-              </span>
-              <ConnectionIndicator status={connectionStatus} />
-            </div>
-          </footer>
+        <div className="flex-1 overflow-auto pb-12">
+          <Routes>
+            <Route path="/" element={<KanbanPage />} />
+            <Route path="/list" element={<ListPage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Routes>
         </div>
       </div>
+
+      {/* Fixed Footer */}
+      <footer className="fixed bottom-0 right-0 left-60 px-4 py-2 border-t bg-background z-20">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
+            {tasks.length} tasks across {epics.length} epics
+          </span>
+          <ConnectionIndicator status={connectionStatus} />
+        </div>
+      </footer>
 
       <CreateModal
         open={showCreateModal}

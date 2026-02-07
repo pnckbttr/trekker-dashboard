@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeader, StatusSelect, PrioritySelect } from "@/components/shared";
@@ -23,8 +24,11 @@ export function DetailsSection({
 }: DetailsSectionProps) {
   const epic = task.epicId ? getEpicById(task.epicId) : null;
   const tags = task.tags ? task.tags.split(",").map((t) => t.trim()) : [];
-  const getTaskStatuses = useConfigStore((state) => state.getTaskStatuses);
-  const taskStatuses = getTaskStatuses().map(s => s.key);
+  const allTaskStatuses = useConfigStore((state) => state.getTaskStatuses());
+  const taskStatuses = useMemo(() => 
+    allTaskStatuses.map(s => s.value),
+    [allTaskStatuses]
+  );
 
   const handleEpicClick = () => {
     if (epic && onEpicClick) {
