@@ -11,7 +11,7 @@ import {
   KeyboardSensor,
   useSensor,
   useSensors,
-  pointerWithin,
+  closestCenter,
 } from "@dnd-kit/core";
 import type { Task, Epic } from "@/types";
 import { KanbanColumn } from "./kanban-column";
@@ -137,7 +137,7 @@ export function KanbanBoard({
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={pointerWithin}
+      collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
