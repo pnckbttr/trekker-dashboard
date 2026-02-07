@@ -19,7 +19,7 @@ const updateEpicSchema = z.object({
   description: z.string().nullable().optional(),
   status: z.enum(EPIC_STATUSES).optional(),
   priority: z.number().int().min(0).max(5).optional(),
-});
+}).passthrough();
 
 // Routes
 app.get("/", async (c) => {
