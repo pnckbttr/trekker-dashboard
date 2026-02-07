@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { BreadcrumbItem } from "@/components/breadcrumb";
 import { StatusSelect, PrioritySelect, EditModalShell } from "@/components/shared";
-import { TASK_STATUSES } from "@/lib/constants";
+import { useConfigStore } from "@/stores/config-store";
 import { TaskFormData } from "./schema";
 import type { Epic } from "@/types";
 
@@ -50,6 +50,7 @@ export function TaskEdit({
     handleSubmit,
     formState: { isSubmitting, errors },
   } = form;
+  const taskStatuses = useConfigStore((state) => state.getVisibleTaskStatuses());
   const title = watch("title");
   const description = watch("description");
   const status = watch("status");
@@ -115,7 +116,7 @@ export function TaskEdit({
             <StatusSelect
               value={status}
               onChange={(v) => setValue("status", v)}
-              statuses={TASK_STATUSES}
+              statuses={taskStatuses.map((s) => s.value)}
             />
           </div>
           <div className="space-y-2">

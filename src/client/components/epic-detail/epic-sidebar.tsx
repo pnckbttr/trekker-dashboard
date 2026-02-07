@@ -10,7 +10,7 @@ import {
   StatusSelect,
   PrioritySelect,
 } from "@/components/shared";
-import { EPIC_STATUSES } from "@/lib/constants";
+import { useConfigStore } from "@/stores/config-store";
 import type { Task } from "@/types";
 
 interface EpicSidebarProps {
@@ -34,6 +34,7 @@ export function EpicSidebar({
   onPriorityChange,
   onTaskClick,
 }: EpicSidebarProps) {
+  const epicStatuses = useConfigStore((state) => state.getEpicStatuses()).filter((s) => s.value !== "archived");
   const epicTasks = tasks.filter((t) => !t.parentTaskId);
   const completedTasks = epicTasks.filter((t) =>
     isTerminalStatus(t.status),
@@ -52,7 +53,7 @@ export function EpicSidebar({
               <StatusSelect
                 value={status}
                 onChange={onStatusChange}
-                statuses={EPIC_STATUSES}
+                statuses={epicStatuses.map((s) => s.value)}
                 triggerClassName="w-auto h-8 text-right"
               />
             </div>

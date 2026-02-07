@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { BreadcrumbItem } from "@/components/breadcrumb";
 import { StatusSelect, PrioritySelect, EditModalShell } from "@/components/shared";
-import { EPIC_STATUSES } from "@/lib/constants";
+import { useConfigStore } from "@/stores/config-store";
 import { EpicFormData } from "./schema";
 
 interface EpicEditProps {
@@ -40,6 +40,7 @@ export function EpicEdit({
     handleSubmit,
     formState: { isSubmitting, errors },
   } = form;
+  const epicStatuses = useConfigStore((state) => state.getEpicStatuses()).filter((s) => s.value !== "archived");
   const title = watch("title");
   const description = watch("description");
   const status = watch("status");
@@ -103,7 +104,7 @@ export function EpicEdit({
             <StatusSelect
               value={status}
               onChange={(v) => setValue("status", v)}
-              statuses={EPIC_STATUSES}
+              statuses={epicStatuses.map((s) => s.value)}
             />
           </div>
           <div className="space-y-2">
