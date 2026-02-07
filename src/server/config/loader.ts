@@ -52,6 +52,7 @@ const DEFAULT_CONFIG: TrekkerConfig = {
     epic: [
       { value: "todo", label: "📝 To Do", description: "Epics that are planned" },
       { value: "in_progress", label: "🚧 In Progress", description: "Epics currently being worked on" },
+      { value: "feedback", label: "💬 Feedback", description: "Epics waiting for feedback or review" },
       { value: "completed", label: "✅ Completed", description: "Epics that are finished" },
       { value: "archived", label: "📦 Archived", description: "Old epics that are archived" },
     ],
