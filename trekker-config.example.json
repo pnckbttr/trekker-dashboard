@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "statuses": {
+    "task": [
+      {
+        "value": "todo",
+        "label": "📝 To Do",
+        "description": "Tasks that are planned but not started"
+      },
+      {
+        "value": "in_progress",
+        "label": "🔨 In Progress",
+        "description": "Tasks that are currently being worked on"
+      },
+      {
+        "value": "feedback",
+        "label": "💬 Feedback",
+        "description": "Tasks waiting for feedback or review"
+      },
+      {
+        "value": "completed",
+        "label": "✅ Completed",
+        "description": "Tasks that are finished"
+      },
+      {
+        "value": "wont_fix",
+        "label": "❌ Won't Fix",
+        "description": "Tasks that won't be implemented"
+      },
+      {
+        "value": "archived",
+        "label": "📦 Archived",
+        "description": "Old tasks that are archived"
+      }
+    ],
+    "epic": [
+      {
+        "value": "todo",
+        "label": "📝 To Do",
+        "description": "Epics that are planned"
+      },
+      {
+        "value": "in_progress",
+        "label": "🔨 In Progress",
+        "description": "Epics currently being worked on"
+      },
+      {
+        "value": "feedback",
+        "label": "💬 Feedback",
+        "description": "Epics waiting for feedback or review"
+      },
+      {
+        "value": "completed",
+        "label": "✅ Completed",
+        "description": "Epics that are finished"
+      },
+      {
+        "value": "archived",
+        "label": "📦 Archived",
+        "description": "Old epics that are archived"
+      }
+    ]
+  },
+  "priorities": [
+    {
+      "value": 0,
+      "label": "🔥 Critical",
+      "color": "#ef4444"
+    },
+    {
+      "value": 1,
+      "label": "⚠️ High",
+      "color": "#f97316"
+    },
+    {
+      "value": 2,
+      "label": "📌 Medium",
+      "color": "#eab308"
+    },
+    {
+      "value": 3,
+      "label": "📎 Low",
+      "color": "#22c55e"
+    },
+    {
+      "value": 4,
+      "label": "💤 Very Low",
+      "color": "#6b7280"
+    },
+    {
+      "value": 5,
+      "label": "🌙 Someday",
+      "color": "#9ca3af"
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "projects": [
+    {
+      "id": "default",
+      "name": "Default Project",
+      "dbPath": ".trekker/trekker.db",
+      "color": "#3b82f6",
+      "createdAt": "2026-02-06T22:37:00.000Z"
+    }
+  ],
+  "settings": {
+    "defaultProject": "default",
+    "theme": "system",
+    "showCompletedTasks": false,
+    "autoSave": true
+  }
+}
