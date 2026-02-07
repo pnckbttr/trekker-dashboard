@@ -77,7 +77,12 @@ export function KanbanBoard({
     const { active, over } = event;
     setActiveId(null);
 
-    if (!over) return;
+    console.log("[DragEnd]", { activeId: active.id, overId: over?.id });
+
+    if (!over) {
+      console.log("[DragEnd] No drop target");
+      return;
+    }
 
     const taskId = active.id as string;
     const newStatus = over.id as string;
@@ -86,21 +91,33 @@ export function KanbanBoard({
     const task = tasks.find((t) => t.id === taskId);
     const epic = epics.find((e) => e.id === taskId);
 
-    if (!task && !epic) return;
+    console.log("[DragEnd]", { task: task?.id, epic: epic?.id, newStatus });
+
+    if (!task && !epic) {
+      console.log("[DragEnd] Item not found in tasks or epics");
+      return;
+    }
 
     // Check if status actually changed
     const currentStatus = task?.status || epic?.status;
-    if (currentStatus === newStatus) return;
+    if (currentStatus === newStatus) {
+      console.log("[DragEnd] Status unchanged");
+      return;
+    }
+
+    console.log("[DragEnd] Updating status", { currentStatus, newStatus });
 
     // Update via mutation hooks (optimistic)
     try {
       if (task) {
         await updateTask.mutateAsync({ id: task.id, data: { status: newStatus } });
+        console.log("[DragEnd] Task updated successfully");
       } else if (epic) {
         await updateEpic.mutateAsync({ id: epic.id, data: { status: newStatus } });
+        console.log("[DragEnd] Epic updated successfully");
       }
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("[DragEnd] Error updating status:", error);
       // TODO: Show error notification
     }
   };
