@@ -77,7 +77,11 @@ export function KanbanBoard({
     const { active, over } = event;
     setActiveId(null);
 
-    console.log("[DragEnd]", { activeId: active.id, overId: over?.id });
+    console.log("[DragEnd]", { 
+      activeId: active.id, 
+      overId: over?.id,
+      allDroppableIds: statusColumns.map(c => c.value)
+    });
 
     if (!over) {
       console.log("[DragEnd] No drop target");
